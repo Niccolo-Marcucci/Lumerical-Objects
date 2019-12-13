@@ -1,0 +1,104 @@
+# This file creates a structure group with the multilayer and the substrate
+# The multilayer will have two types of dielectrics, low and high refrective 
+# index, repeted N times, thus creating 2*N layers. If the last and first 
+# layers are set to be of the same kind (i.e. both low or both high refractive
+# index), the total number of layers will be 2*N+1.
+
+addstructuregroup;
+set('name','multilayer');
+    adduserprop('substrate index',0,1.5);
+    adduserprop('substrate thickness',2,1e-6);
+    adduserprop('H index',0,3);             # high refreactive index layer
+    adduserprop('H thickness',2,0.1e-6);
+    adduserprop('L index',0,2);           # low refreactive index layer
+    adduserprop('L thickness',2,0.1e-6);
+    adduserprop('N layer couples',0,10);
+    adduserprop('first layer type',0,1);    # refractive index of the first and 
+    adduserprop('last layer type',0,0);     # last layers. 0 for low, 1 for high refractive index
+    adduserprop('last layer thickness',0,0.05e-6);
+    adduserprop('domain size',0,1e-6);          # horizontal domain size
+    
+    myscript= " 
+        deleteall;
+        
+        n_sub =      %substrate index%;
+        l_sub =      %substrate thickness%;
+        l_last =     %last layer thickness%;
+        XY =         %domain size%;
+        
+        N =          %N layer couples%;
+        type_first = %first layer type%;       # 0 if multilayer starts with low index, 1 else
+        type_last =  %last layer type%;        # 0 if multilayer ends with low index, 1 else
+        
+        if (type_first) {
+            n_a = %H index%;
+            n_b = %L index%;
+            l_a = %H thickness%;
+            l_b = %L thickness%;
+        } else {
+            n_a = %L index%;
+            n_b = %H index%;
+            l_a = %L thickness%;
+            l_b = %H thickness%;
+        }
+        
+        l_period =   l_a + l_b;
+        
+        if (type_first == type_last) {
+            last_isInExcess = 1;
+        } else {
+            last_isInExcess = 0;
+        }
+        
+        l_tot = l_sub + l_period*(N-1)+ l_a +l_b*(!last_isInExcess)+ l_a*(last_isInExcess);
+        addrect;
+            set('name','substrate');
+            set('x',0);
+            set('x span',XY);
+            set('y',0);
+            set('y span',XY);
+            set('z min',-l_tot);
+            set('z max',-l_tot+l_sub);
+            set('index',n_sub);
+            
+        for (i=1:N) {
+            addrect;
+                set('name','A'+num2str(i));
+                set('x',0);
+                set('x span',XY);
+                set('y',0);
+                set('y span',XY);
+                set('z min',-l_tot+l_sub+(i-1)*l_period);
+                set('z max',-l_tot+l_sub+(i-1)*l_period+l_a);
+                set('index',n_a);
+            addrect;
+                set('name','B'+num2str(i));
+                set('x',0);
+                set('x span',XY);
+                set('y',0);
+                set('y span',XY);
+                
+            if (i != N | last_isInExcess ) {
+                set('z min',-l_tot+l_sub+i*l_period-l_b);
+                set('z max',-l_tot+l_sub+i*l_period);
+                set('index',n_b);
+            } else if (!last_isInExcess) {
+                set('z min',-l_tot+l_sub+i*l_period-l_b);
+                set('z max',-l_tot+l_sub+i*l_period);
+                set('index',n_b);
+            } 
+        }
+        if (last_isInExcess) {
+        addrect;
+            set('name','A'+num2str(i));
+            set('x',0);
+            set('x span',XY);
+            set('y',0);
+            set('y span',XY);
+            set('z min',-l_tot+l_sub+N*l_period);
+            set('z max',-l_tot+l_sub+N*l_period+l_last);
+            set('index',n_a);
+        }
+    ";
+    
+set('script',myscript); 
