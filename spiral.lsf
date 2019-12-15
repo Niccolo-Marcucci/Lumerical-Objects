@@ -1,0 +1,24 @@
+# This file creates a spiral shaped structure in which it is possible to set
+# the number of arms, the internal diameter, the period of the spiral and the  
+# number of turns the arms do (actually it sets the number of periods seen 
+# radially, from the center outwards).
+# This spiral structure can be used for creating grooves onto a dielectric layer
+# (hence the name chosen for the various properties).
+
+addstructuregroup;
+set('name','multilayer');
+    adduserprop('material groove',?,'<Object defined dielectric>');
+    adduserprop('index groove',0,1);
+    adduserprop('N rings',0,10);             # high refreactive index layer
+    adduserprop('topological charge',0,2);   # number of arms of the spiral
+    adduserprop('z span',2,0.1e-6);          # thickness
+    adduserprop('resolution',0,50);	     # number of points used for creating the spiral
+    adduserprop('start radius',2,1e-6);
+    adduserprop('dbr period',2,0.25e-6);
+    adduserprop('fill factor',0,0.5);
+    
+    myscript= " 
+        deleteall;
+    ";
+    
+set('script',myscript); 
