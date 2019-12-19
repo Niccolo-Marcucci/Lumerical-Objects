@@ -1,0 +1,83 @@
+# This file creates a spiral shaped structure in which it is possible to set
+# the number of arms, the internal diameter, the period of the spiral and the  
+# number of turns the arms do (actually it sets the number of periods seen 
+# radially, from the center outwards).
+# This spiral structure can be used for creating grooves onto a dielectric layer
+# (hence the name chosen for the various properties).
+
+addstructuregroup;
+set('name','spiral outcoupler');
+set('x',0);
+set('y',0);
+set('z',0);
+    adduserprop('material groove',5,'<Object defined dielectric>');
+    adduserprop('index groove',0,1);
+    adduserprop('N rings',0,10);             # high refreactive index layer
+    adduserprop('topological charge',0,2);   # number of arms of the spiral
+    adduserprop('thickness',2,0.1e-6);          # thickness
+    adduserprop('resolution',0,50);	     # number of points used for creating the spiral
+    adduserprop('start radius',2,1.5e-6);
+    adduserprop('dbr period',2,0.25e-6);
+    adduserprop('fill factor',0,0.5);
+    
+    myscript= " 
+        deleteall;
+        material_out = %material groove%;
+        index_out = %index groove%;
+        n_rings = %N rings%;
+        start_radius = %start radius%;
+        lambda = %dbr period%;
+        n_arms = %topological charge%;
+        FF = %fill factor%;
+        
+        resolution = 2*resolution*n_rings;  # even value required
+        
+        radius = matrix(resolution);        # radius, function of theta
+        theta = matrix(resolution);
+        vertices = matrix(2,resolution);
+        
+        int_res=15;
+        r_n=matrix(int_res);
+        the=matrix(int_res);
+        vert=matrix(2,int_res);
+        
+        # Each arm opf the spiral is defined by a polygon 
+        for (j=0:abs(n_arms)-1) { 
+              # define theta   
+              theta(1:resolution/2) = linspace(0,2*pi*n_rings/n_arms,resolution/2);
+              theta((resolution/2+1):resolution) = linspace(2*pi*n_rings/n_arms,0,resolution/2);
+              # parametrize the radius
+              radius(1:resolution/2) = linspace(start_radius,start_radius+lambda*n_rings,resolution/2);
+              radius((resolution/2+1):resolution) = linspace(start_radius+lambda*n_rings+lambda*FF,start_radius+lambda*FF,resolution/2);
+              vertices(1,1:resolution) = radius*cos(theta+2*pi*j/n_arms);		
+              vertices(2,1:resolution) = radius*sin(theta+2*pi*j/n_arms);
+            
+              # add polygon object and set properties
+              addpoly;		
+              set('name','loop_A_'+num2str(j));
+              set('vertices',vertices);
+              set('material',material_out);
+              if(get('material')=='<Object defined dielectric>') 
+                { set('index',index_out); }
+              set('z min', 0);
+              set('z max', thickness);
+            
+              if (start_radius == 0) {
+                  # close the spiral on the origin if the initial radius is null
+                  r_n = linspace(start_radius+lambda*FF,0,int_res);
+                  the = linspace(0,-pi/n_arms,int_res);
+                  vert(1,:) = r_n*cos(the+2*pi*j/n_arms);		
+                  vert(2,:) = r_n*sin(the+2*pi*j/n_arms);
+                  addpoly;		
+                  set('name','start bump'+num2str(j));
+                  set('vertices',vert);
+                  set('material',material_out);
+                  if(get('material')=='<Object defined dielectric>') 
+                    { set('index',index_out); }
+                  set('z min', 0);
+                  set('z max', thickness);
+              }
+        }
+    ";
+    
+set('script',myscript); 

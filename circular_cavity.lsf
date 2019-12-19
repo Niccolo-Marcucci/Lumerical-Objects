@@ -4,16 +4,49 @@
 
 addstructuregroup;
 set('name','circular cavity');
+set('x',0);
+set('y',0);
+set('z',0);
     adduserprop('N_periods',0,5);	    # number of rings in the DBR
-    adduserprop('D',2,500e-9);		    # diameter of the central cavity
-    adduserprop('period',2,250e-9);        
-    adduserprop('thickness',2,75e-9;
+    adduserprop('D',2,0.5e-6);	    # diameter of the central cavity
+    adduserprop('period',2,0.25e-6);        
+    adduserprop('thickness',2,75e-9);
     adduserprop('n_groove',0,1);            # refreactive index of the groove (air)
     adduserprop('n_layer',2,1.5);     	    # refreactive index of the dielectric layer
     adduserprop('domain size',0,1e-6);      # horizontal domain size
     
     myscript= " 
         deleteall;
+        if (%domain size% >= D+2*N_periods*period) {
+            XY = %domain size%;
+        } else {
+            XY = D+2*N_periods*period;
+        }
+        
+        addrect;
+            set('name','base');
+            set('x',0);
+            set('x span',XY);
+            set('y',0);
+            set('y span',XY);
+            set('z min',0);
+            set('z max',thickness);
+            set('index', n_layer);
+            
+        for (n = 1:N_periods){
+            addring;
+                set('name','groove' + num2str(n));
+                set('x',0);
+                set('y',0);
+                set('inner radius',D/2+(n-1)*period);
+                set('outer radius',D/2+(n-0.5)*period);
+                set('z min',0);
+                set('z max',thickness);
+                set('theta start',0);
+                set('theta stop',360);
+                set('material','<Object defined dielectric>');
+                set('index', n_groove);
+        }
     ";
     
 set('script',myscript); 

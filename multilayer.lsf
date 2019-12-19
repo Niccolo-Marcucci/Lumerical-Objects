@@ -6,6 +6,9 @@
 
 addstructuregroup;
 set('name','multilayer');
+set('x',0);
+set('y',0);
+set('z',0);
     adduserprop('substrate index',0,1.5);
     adduserprop('substrate thickness',2,1e-6);
     adduserprop('H index',0,3);             # high refreactive index layer

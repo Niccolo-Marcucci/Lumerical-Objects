@@ -1,0 +1,78 @@
+# This script is the one provided by the lumerical default analyss group, 
+# slightly modified for our simulation pourposes
+
+###############################################
+ #Description: resonance finder
+
+ #Calculates the spectrum of resonances of |E|^2
+ #and |H|^2. Plots the results, and outputs
+ #a vector of wavelength (lambda) and
+ #frequency (f) of resonant peaks
+
+ #Copyright 2010, Lumerical Solutions, Inc.
+###############################################
+
+N = %N monitors%;
+        
+# get some monitor data from first monitor  
+mname = "t1"; # monitor name
+component = "Hz"; # field component
+t = getdata(mname,"t");
+field0_t = pinch(getdata(mname,component));
+
+# find range of frequencies where we have some source power
+# and restrict analysis to that range
+w = fftw(t,1);
+sn2 = abs(sourcenorm(w/(2*pi)))^2;
+max_sn2 = max(sn2);
+p1 = 1;
+for(p1=1; sn2(p1) < 1e-2*max_sn2; p1=p1+1) { 1; }
+for(p2=p1; sn2(p2) < 0.9*max_sn2; p2=p2+1) { 1; }
+for(p2=p2; (sn2(p2) > 1e-2*max_sn2) and (p2 < length(sn2)-1); p2=p2+1) { 1; }
+w = linspace(w(p1),w(p2),frequency_points);
+f = w/(2*pi);
+lambda = c/f;
+
+# do fft to frequency domain for all monitors
+
+#set the time apodization settings as a fraction of total simulation time
+fractional_time_width = 1/6;
+fractional_time_center = 1/2;
+apodize = exp( - 0.5*(t-max(t)*fractional_time_center)^2/(fractional_time_width*max(t))^2);
+
+spectrum = 0;
+for(i=1:N) {
+    mname = "t" + num2str(i);
+    for(j=1:3) {           # use 4:6 if interested to work with magnetic field
+      if(almostequal(j,1)) { component = "Ex"; }
+      if(almostequal(j,2)) { component = "Ey"; }
+      if(almostequal(j,3)) { component = "Ez"; }
+      if(almostequal(j,4)) { component = "Hx"; }
+      if(almostequal(j,5)) { component = "Hy"; }
+      if(almostequal(j,6)) { component = "Hz"; }
+      if(j > 3.5) { extra_factor = sqrt( mu0/eps0); }
+      else { extra_factor = 1; }
+      if(havedata(mname,component)) {
+        spectrum =   spectrum + 
+                  abs( extra_factor*czt(apodize*pinch(getdata(mname,component)),t,w) )^2;
+      }
+   }  
+}
+
+frequency = f;
+spectrum = spectrum / abs(sourcenorm(f))^2;
+plot(lambda*1e6,log10(spectrum),"wavelength (microns)","spectrum, logscale (a.u.)");
+
+
+# find resonant peaks
+p = findpeaks(spectrum,%number of resonances%);
+lambda0 = lambda(p);
+f0 = f(p);
+
+
+# output results
+for(i=1:length(p)) {
+  ?"Resonances " + num2str(i) + ":";
+  ?"  wavelength = " + num2str(lambda0(i)*1e9) + " nm";
+  ?"  frequency  = " + num2str(f0(i)*1e-12) + " THz";
+}
