@@ -1,8 +1,6 @@
 # This file creates a structure group with the multilayer and the substrate
-# The multilayer will have two types of dielectrics, low and high refrective 
-# index, repeted N times, thus creating 2*N layers. If the last and first 
-# layers are set to be of the same kind (i.e. both low or both high refractive
-# index), the total number of layers will be 2*N+1.
+# The multilayer design will be determined by one vector of containg the refractive index 
+# of each layer and another one contanig the thickness of each layer.
 
 addstructuregroup;
 set('name','multilayer');
