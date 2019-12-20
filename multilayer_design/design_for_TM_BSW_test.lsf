@@ -1,0 +1,64 @@
+closeall;
+clear;
+
+lambda=linspace(570-100,570+100,500);
+f = c/(lambda*1e-9);         # frequency vector
+theta = linspace(40,56,500);                    # angle vector
+lambda=570e-9;
+
+n_AlO=1.65+1i*1e-4;
+n_in=1.5;
+n_out=1;
+nL=1.49+1i*1e-4;
+nH=2.53+1i*1e-4;
+ntail=1.49;
+
+N=11;
+
+kL=2*pi/lambda*real(nL)*cos(40/180*pi);
+kH=2*pi/lambda*real(nH)*cos(40/180*pi);
+FF=0.7;
+#for (FF=0.5:0.1:0.9){
+period=pi*0.95/(kL*FF+kH*(1-FF));
+dL=period*FF;
+dH=period*(1-FF);
+
+dlast=0;
+dsecondlast=0.2*dH;
+for (dAlO=0:5e-9:25e-9){
+#dAlO=15e-9;#dL;
+tail=0;
+
+# N high-low couples + one for substrate, one for air, one for the pmma layer, one for last titania
+# one for allumina protective layer and one for second last titania.
+N_layers=2*N+6;    
+
+n1 = matrix(N_layers);
+d  = matrix(N_layers);
+
+n1(1) = n_in;
+n1(2:2:2*N) = nH;
+n1(3:2:2*N+1) = nL;
+n1(end-4) = nH;#;
+n1(end-3) = n_AlO;
+n1(end-2) = nH;
+n1(end-1) = ntail;
+n1(end) = n_out;
+
+d(1) = 1e-6;
+d(2:2:2*N) = dH;
+d(3:2:2*N+1) = dL;
+d(end-5) = 0.5*dL;
+d(end-4) = dsecondlast;#;
+d(end-3) = dAlO;
+d(end-2) = dlast;
+d(end-1) = tail;
+d(end) = n_out;
+
+RT1 = stackrt(n1,d,c/lambda,theta);
+
+#image(RT1.theta,RT1.lambda*1e6,transpose(RT1.Rp),"theta (deg)","wavelength (um)","Rp, dispersive example");
+plot(theta,RT1.Rp);
+holdon;
+
+}
