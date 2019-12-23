@@ -3,7 +3,7 @@ clear;
 
 lambda=linspace(570-100,570+100,500);
 f = c/(lambda*1e-9);         # frequency vector
-theta = linspace(40,60,500);                    # angle vector
+theta = linspace(40,60,10000);                    # angle vector10
 lambda=570e-9;
 
 n_AlO=1.65+1i*1e-4;
@@ -31,9 +31,9 @@ tail=0;
 # one for allumina protective layer and one for second last titania.
 N_layers=2*N+6;    
      
-for (value=[0,60e-9]){#
+for (value=[0,dH*1.45]){#60e-9
 
-tail=value;
+dlast=value;
 
 n1 = matrix(N_layers);
 d  = matrix(N_layers);
