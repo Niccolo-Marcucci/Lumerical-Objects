@@ -1,7 +1,7 @@
 function [P, z] = field_distribution(lambda,theta,d,n,r,pol)
 
 
-sizeZ=1e3;
+sizeZ=5e3;
 z=linspace(d(1),sum(d),sizeZ);
 nz = n(1)*ones(1,sizeZ);
 for i=1:sizeZ
@@ -25,8 +25,12 @@ for i=1:sizeZ-1
         E(:,i+1)=Tij(nz(i),nz(i+1),theta_z(i),theta_z(i+1),pol)*E(:,i+1);
     end
 end
-
-P = abs(E(1,:)+E(2,:)).^2;
+if pol == 'p'
+    H_correction=nz/physconst('lightspeed');
+else
+    H_correction=ones(1,sizeZ);
+end
+P = abs((E(1,:)+E(2,:)).*H_correction).^2;
 
 %% functions
 function D = Dij(n_i,n_j,theta_i,theta_j,pol)
@@ -51,7 +55,7 @@ function T = Tij(n_i,n_j,theta_i,theta_j,pol)
         rij = (n_i*cos(theta_i)-n_j*cos(theta_j))./...
               (n_i*cos(theta_i)+n_j*cos(theta_j));
         rji = -rij;
-        tji = rji + 1;
+        tji =  rji + 1;
     elseif pol == 'p'
         rij = (n_j*cos(theta_i)-n_i*cos(theta_j))./...
               (n_j*cos(theta_i)+n_i*cos(theta_j));
@@ -68,7 +72,7 @@ end
 function P = prop(k,d,theta)
     kz=k*cos(theta); 
     P = [exp(-1i*(kz*d)), 0   ;  
-          0 , exp(1i*(kz*d)) ];
+          0 , exp(+1i*(kz*d)) ];
 end
 
 end

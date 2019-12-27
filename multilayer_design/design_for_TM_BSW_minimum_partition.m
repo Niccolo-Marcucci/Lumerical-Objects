@@ -54,16 +54,25 @@ for l=1:2
     
     theta = linspace(40,60,1000);
     [R,r] = reflectivity(lambda,theta,d,n1,'p');
-    [~,idx]=findpeaks(1-R,'Npeaks',1,'SortStr','descend');
+    [~,idx] = findpeaks(1-R,'Npeaks',1,'SortStr','descend');
     
     figure(1)
     plot(theta,R);
-    hold
-    
-    
+    hold on
+     
+    if isempty(idx)
+        warning("BSK dip not found")
+        continue
+    end
     [P, z] = field_distribution(lambda,theta(idx),d,n1,r(idx),'p');
     figure(2)
     semilogy(z,P);
+    hold on
+    
+%     [r,t,x,Nn,E] = tmm(lambda,n1,d);
+%     figure(3)
+%     plot(x,E)
+%     nicePlot;
 end
     
 %     %%
