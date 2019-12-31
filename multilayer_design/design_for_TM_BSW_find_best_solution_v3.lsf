@@ -46,14 +46,18 @@ dsecondlastTitania_0=0.2*dH_0;
 dlastSilica_0=dL_0*0.75;
 d_out=0e-6;
 
-best_parameters=matrix(7);
-best_parameters(1) = 75e-9;          # pmma thickness
-best_parameters(2) = dH_0*1.45;      # last titania layer thickness
-best_parameters(3) = 20e-9;          # AlO layer thicknes (etch stop layer)
-best_parameters(4) = 0.2*dH_0;       # second last titania layer (a layer below etch stop)
-best_parameters(5) = dL_0*0.75;      # last Silica layer
-best_parameters(6) = dL_0;
-best_parameters(7) = dH_0;
+#best_parameters=matrix(7);
+#start_parameters=matrix(7);
+#start_parameters(1) = 75e-9;          # pmma thickness
+#start_parameters(2) = dH_0*1.45;      # last titania layer thickness
+#start_parameters(3) = 20e-9;          # AlO layer thicknes (etch stop layer)
+#start_parameters(4) = 0.2*dH_0;       # second last titania layer (a layer below etch stop)
+#start_parameters(5) = dL_0*0.75;      # last Silica layer
+#start_parameters(6) = dL_0;
+#start_parameters(7) = dH_0;
+
+loaddata('best_design4');
+start_parameters = best_parameters;
 
 # N high-low couples + one for substrate, one for air, one for the pmma layer, one for last titania
 # one for allumina protective layer and one for second last titania.
@@ -69,17 +73,12 @@ P=matrix(10);
 Partition = 0;#length(P); 
 P_old = Partition;
 i=0;
-j=0;
 tol=1;
 for (0; tol ; 0) {   # while loop
-    i=i+1;
-    j=j+1;
-    if (i==8) {
-        i=1;
-    }
-    
     parameters = best_parameters ;
-    value = best_parameters(i)*1e9;
+    for (i=1:7){
+    #
+    value = start_parameters(i)*1e9;
     if (i==1) {             # pmma thickness
         rangee = value/2;
     } else if (i==2) {      # last titania layer thickness
@@ -96,8 +95,9 @@ for (0; tol ; 0) {   # while loop
     } else if (i==7) {
         rangee = value*0.1;        
     }
-    parameters(i)=toss(value,rangee)*1e-9;
     
+    parameters(i)=toss(value,rangee)*1e-9;
+    }
     tail = parameters(1);
     dlastTitania = parameters(2);
     dAlO = parameters(3);
@@ -200,17 +200,16 @@ for (0; tol ; 0) {   # while loop
     P(7)=threshold(1-r3(idx3),min_r,max_r);
     
     min_H = 800;
-    max_H = 1200;
+    max_H = 1000;
     P( 8) = threshold(H1,min_r,max_r);
-    P( 9) = threshold(H2,min_r,max_r)*2;
-    P(10) = threshold(H3,min_r,max_r)*2;
+    P( 9) = threshold(H2,min_r,max_r);
+    P(10) = threshold(H3,min_r,max_r);
     
     P_new = prod(P);
     if (P_new > P_old and theta(idx1) > theta_lim and theta(idx2) > theta_lim and theta(idx3) > theta_lim) {
         P_old = Partition;
         Partition = P_new;
         best_parameters = parameters;
-        ?j;
         if (P(1)>0.8 and P(2)>0.8 and P(5)>0.9 and P(6)>0.9 and P(7)>0.9 and P(8)>0.3 and P(9)>0.3 and P(10)>0.3 ) {
             tol=0;
         }
@@ -220,4 +219,4 @@ for (0; tol ; 0) {   # while loop
 }
 
 #matlabsave('best_design',best_parameters);
-savedata('best_design4',best_parameters);
+savedata('best_design5',best_parameters);
