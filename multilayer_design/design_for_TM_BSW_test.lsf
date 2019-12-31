@@ -1,7 +1,7 @@
 closeall;
 clear;
 
-theta = linspace(40,56,500);                    # angle vector
+theta = linspace(40,56,10000);                    # angle vector
 lambda=570e-9;
 
 n_AlO=1.65+1i*1e-4;
@@ -11,7 +11,7 @@ nL=1.49+1i*1e-4;
 nH=2.53+1i*1e-4;
 ntail=1.49;
 
-loaddata('best_design2');
+loaddata('best_design4');
 parameters = best_parameters;
 tail = parameters(1);
 dlastTitania = parameters(2);
