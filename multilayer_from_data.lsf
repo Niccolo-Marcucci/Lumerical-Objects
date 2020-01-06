@@ -1,0 +1,39 @@
+# This file creates a structure group with the multilayer and the substrate
+# The multilayer design will be determined by one vector of containg the refractive index 
+# of each layer and another one contanig the thickness of each layer.
+deleteall;
+addstructuregroup;
+set('name','multilayer');
+set('x',0);
+set('y',0);
+set('z',0);
+    adduserprop('data file',1,'multilayer_design/best_design.ldf');
+    adduserprop('substrate thickness',2,1e-6);
+    adduserprop('domain size',2,1e-6);          # horizontal domain size
+    
+    myscript= " 
+        deleteall;
+        
+        loaddata( %data file% ); # n1 and d layers vector
+        
+        d(1) = %substrate thickness% ;
+        d(end) = 0 ;             # air
+        N = length(d);
+        XY =         %domain size%;
+            
+        for (i=1:N-1) {
+            if ( !almostequal(d(i),0) ) {
+                addrect;
+                set('name','layer' + num2str(i) + '_'+ num2str(real(n1(i))));
+                set('x',0);
+                set('x span',XY);
+                set('y',0);
+                set('y span',XY);
+                set('z min',-sum(d(i:end)));
+                set('z max',-sum(d(i+1:end)));
+                set('index',n1(i));
+            }
+        }
+    ";
+    
+set('script',myscript); 
