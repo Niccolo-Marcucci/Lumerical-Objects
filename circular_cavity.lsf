@@ -18,11 +18,11 @@ set('z',0);
         
     myscript= " 
         deleteall;
-        if (%domain size% >= D+2*N_periods*period) {
-            XY = %domain size%;
-        } else {
-            XY = D+2*N_periods*period;
-        }
+        #if (%domain size% >= D+2*N_periods*period) {
+            #XY = %domain size%;
+        #} else {
+            #XY = D+2*N_periods*period;
+        #}
         
         #addrect;
             #set('name','base');
