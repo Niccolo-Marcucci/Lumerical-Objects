@@ -63,7 +63,8 @@ for (i=1:3){
     H=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;#
     z=field.z;
     if (i==1) { 
-        savedata('best_design',n1,d);
+        n_eff=sin(theta(idx)*pi/180)*n_in;
+        savedata('best_design',n1,d,n_eff);
         nz = n1(1)*ones(length(z));
         for (i=1:length(z)) {
             for (j=2:length(d)) {
