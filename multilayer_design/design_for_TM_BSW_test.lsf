@@ -31,7 +31,7 @@ N_layers=2*N+6;
 
 n1 = matrix(N_layers);
 d  = matrix(N_layers);
-
+n_effective = matrix(3);
 n1(1) = n_in;
 n1(2:2:2*N) = nH;
 n1(3:2:2*N+1) = nL;
@@ -41,8 +41,8 @@ n1(end-2) = nH;
 n1(end-1) = ntail;
 n1(end) = n_out;
 for (i=1:3){
-    if(i==2){ tail = 0; }
-    if(i==3){ dlastTitania = 0; }
+    if(i==2){ tail = 0; n_eff2 = sin(theta(idx)*pi/180)*n_in;}
+    if(i==3){ dlastTitania = 0; n_eff3 = sin(theta(idx)*pi/180)*n_in;}
     
     d(1) = 1e-6;
     d(2:2:2*N) = dH;
@@ -62,9 +62,11 @@ for (i=1:3){
     field = stackfield(n1,d,c/lambda,theta(idx),1e4,0,5e-6);
     H=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;#
     z=field.z;
+    
     if (i==1) { 
-        n_eff=sin(theta(idx)*pi/180)*n_in;
-        savedata('best_design',n1,d,n_eff);
+        n_eff1 = sin(theta(idx)*pi/180)*n_in;
+        idx_layers = n1;
+        d_layers = d;
         nz = n1(1)*ones(length(z));
         for (i=1:length(z)) {
             for (j=2:length(d)) {
@@ -84,6 +86,10 @@ for (i=1:3){
         plot(z,H);
     }    
 }
+
 selectfigure(2);
 holdon;
 plot(z,real(nz)*200);
+
+
+savedata('best_design',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);

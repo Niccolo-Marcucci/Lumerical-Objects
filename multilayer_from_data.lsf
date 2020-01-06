@@ -15,7 +15,8 @@ set('z',0);
         deleteall;
         
         loaddata( %data file% ); # n1 and d layers vector
-        
+        n1 = idx_layers;
+        d = d_layers;
         d(1) = %substrate thickness% ;
         d(end) = 0 ;             # air
         N = length(d);
