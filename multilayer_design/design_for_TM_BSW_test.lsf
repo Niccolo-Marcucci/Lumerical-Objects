@@ -41,8 +41,8 @@ n1(end-2) = nH;
 n1(end-1) = ntail;
 n1(end) = n_out;
 for (i=1:3){
-    if(i==2){ tail = 0; n_eff2 = sin(theta(idx)*pi/180)*n_in;}
-    if(i==3){ dlastTitania = 0; n_eff3 = sin(theta(idx)*pi/180)*n_in;}
+    if(i==2){ tail = 0; }
+    if(i==3){ dlastTitania = 0;}
     
     d(1) = 1e-6;
     d(2:2:2*N) = dH;
@@ -78,6 +78,8 @@ for (i=1:3){
         plot(theta,RT1.Rp); 
         plot(z,H);
     } else {
+        if(i==2){ n_eff2 = sin(theta(idx)*pi/180)*n_in; }
+        else {    n_eff3 = sin(theta(idx)*pi/180)*n_in; }
         selectfigure(1);
         holdon;
         plot(theta,RT1.Rp); 
