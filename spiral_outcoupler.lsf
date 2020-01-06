@@ -19,6 +19,7 @@ set('z',0);
     adduserprop('start radius',2,1.5e-6);
     adduserprop('dbr period',2,0.25e-6);
     adduserprop('fill factor',0,0.5);
+    adduserprop('z min',2,0);
     
     myscript= " 
         deleteall;
@@ -59,7 +60,7 @@ set('z',0);
               set('material',material_out);
               if(get('material')=='<Object defined dielectric>') 
                 { set('index',index_out); }
-              set('z min', 0);
+              set('z min', %z min%);
               set('z max', thickness);
             
               if (start_radius == 0) {
@@ -74,7 +75,7 @@ set('z',0);
                   set('material',material_out);
                   if(get('material')=='<Object defined dielectric>') 
                     { set('index',index_out); }
-                  set('z min', 0);
+                  set('z min', %z min%);
                   set('z max', thickness);
               }
         }
