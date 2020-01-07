@@ -61,7 +61,7 @@ set('z',0);
               if(get('material')=='<Object defined dielectric>') 
                 { set('index',index_out); }
               set('z min', %z min%);
-              set('z max', thickness);
+              set('z max', %z min%+thickness);
             
               if (start_radius == 0) {
                   # close the spiral on the origin if the initial radius is null
@@ -76,7 +76,7 @@ set('z',0);
                   if(get('material')=='<Object defined dielectric>') 
                     { set('index',index_out); }
                   set('z min', %z min%);
-                  set('z max', thickness);
+                  set('z max', %z min%+thickness);
               }
         }
     ";

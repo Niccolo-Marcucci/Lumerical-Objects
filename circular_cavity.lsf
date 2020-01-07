@@ -42,7 +42,7 @@ set('z',0);
                 set('inner radius',D/2+(n-1)*period);
                 set('outer radius',D/2+(n-0.5)*period);
                 set('z min',%z min%);
-                set('z max',thickness);
+                set('z max',%z min%+thickness);
                 set('theta start',0);
                 set('theta stop',360);
                 set('material','<Object defined dielectric>');
