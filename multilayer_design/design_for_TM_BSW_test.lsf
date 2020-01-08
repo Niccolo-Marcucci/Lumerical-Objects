@@ -11,7 +11,7 @@ nL=1.49+1i*1e-4;
 nH=2.53+1i*1e-4;
 ntail=1.49;
 
-loaddata('best_param');
+loaddata('best_param2');
 parameters = best_parameters;
 tail = parameters(1);
 dlastTitania = parameters(2);
@@ -91,7 +91,7 @@ for (i=1:3){
 
 selectfigure(2);
 holdon;
-plot(z,real(nz)*200);
+plot(z,real(nz)*400);
 
 
 savedata('best_design',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);

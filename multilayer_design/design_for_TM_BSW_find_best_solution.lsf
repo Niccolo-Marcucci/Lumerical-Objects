@@ -28,7 +28,7 @@ nL=1.49+1i*1e-4;
 nH=2.53+1i*1e-4;
 ntail=1.49;
 
-theta_lim = asin(n_out/n_in)/pi*180+0.2;
+theta_lim = asin(n_out/n_in)/pi*180+0.5;
 theta = linspace(40,60,1e4);                    # angle vector10
 lambda=570e-9;
 N=11;
@@ -47,7 +47,7 @@ dlastSilica_0=dL_0*0.75;
 d_out=0e-6;
 
 best_parameters=matrix(7);
-best_parameters(1) = 75e-9;          # pmma thickness
+best_parameters(1) = 0e-9;          # pmma thickness
 best_parameters(2) = dH_0*1.45;      # last titania layer thickness
 best_parameters(3) = 20e-9;          # AlO layer thicknes (etch stop layer)
 best_parameters(4) = 0.2*dH_0;       # second last titania layer (a layer below etch stop)
@@ -68,14 +68,14 @@ d3 = matrix(N_layers-2);
 P=matrix(10);
 Partition = 0;#length(P); 
 P_old = Partition;
-i=0;
+i=2;
 j=0;
 tol=1;
 for (0; tol ; 0) {   # while loop
     i=i+1;
     j=j+1;
     if (i==8) {
-        i=1;
+        i=2;
     }
     
     parameters = best_parameters ;
@@ -157,11 +157,11 @@ for (0; tol ; 0) {   # while loop
     d3(end-1) = dAlO;
     d3(end) = d_out;
     
-    RT = stackrt(n1,d1,c/lambda,theta);
-    r1=RT.Rp;
-    idx1=findpeaks(1-r1);
-    field = stackfield(n1,d1,c/lambda,theta(idx1),1,sum(d1),sum(d1));
-    H1=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;
+    #RT = stackrt(n1,d1,c/lambda,theta);
+    #r1=RT.Rp;
+    #idx1=findpeaks(1-r1);
+    #field = stackfield(n1,d1,c/lambda,theta(idx1),1,sum(d1),sum(d1));
+    #H1=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;
     RT = stackrt(n2,d2,c/lambda,theta);
     r2=RT.Rp;
     idx2=findpeaks(1-r2);
@@ -173,12 +173,12 @@ for (0; tol ; 0) {   # while loop
     field = stackfield(n3,d3,c/lambda,theta(idx3),1,sum(d3),sum(d3));
     H3=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;
     
-    n_eff1=sin(theta(idx1)*pi/180)*n_in;
+    #n_eff1=sin(theta(idx1)*pi/180)*n_in;
     n_eff2=sin(theta(idx2)*pi/180)*n_in;
     n_eff3=sin(theta(idx3)*pi/180)*n_in;
     
-    contrast1a=n_eff1-n_eff2;
-    contrast1b=n_eff1/n_eff2;
+    #contrast1a=n_eff1-n_eff2;
+    #contrast1b=n_eff1/n_eff2;
     
     contrast2a=n_eff3-n_eff2;
     contrast2b=n_eff3/n_eff2;
@@ -188,20 +188,20 @@ for (0; tol ; 0) {   # while loop
     max_a=0.125;
     min_b=1.100;
     max_b=1.125;
-    P(1) = threshold(contrast1a,min_a,max_a);
+    P(1) = 1; #threshold(contrast1a,min_a,max_a);
     P(2) = threshold(contrast2a,min_a,max_a);
-    P(3) = threshold(contrast1b,min_b,max_b);
+    P(3) = 1; #threshold(contrast1b,min_b,max_b);
     P(4) = threshold(contrast2b,min_b,max_b);
      
     min_r = 0.20;
     max_r = 0.30;
+    P(5)=1; #threshold(1-r1(idx1),min_r,max_r);
     P(6)=threshold(1-r2(idx2),min_r,max_r);
-    P(5)=threshold(1-r1(idx1),min_r,max_r);
     P(7)=threshold(1-r3(idx3),min_r,max_r);
     
     min_H = 800;
     max_H = 1200;
-    P( 8) = threshold(H1,min_r,max_r);
+    P( 8) = 1;# threshold(H1,min_r,max_r);
     P( 9) = threshold(H2,min_r,max_r)*2;
     P(10) = threshold(H3,min_r,max_r)*2;
     
@@ -215,9 +215,9 @@ for (0; tol ; 0) {   # while loop
             tol=0;
         }
         closeall;
-        plot(theta,r1,r2,r3);
+        plot(theta,r2,r2,r3);
     }
 }
 
-#matlabsave('best_design',best_parameters);
-savedata('best_design4',best_parameters);
+#matlabsave('best_param',best_parameters);
+savedata('best_param',best_parameters);
