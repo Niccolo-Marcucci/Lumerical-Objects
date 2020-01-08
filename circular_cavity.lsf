@@ -33,7 +33,7 @@ set('z',0);
             #set('z min',0);
             #set('z max',thickness);
             #set('index', n_layer);
-            
+        if (N_periods!=0) {
         for (n = 1:N_periods){
             addring;
                 set('name','groove' + num2str(n));
@@ -47,6 +47,7 @@ set('z',0);
                 set('theta stop',360);
                 set('material','<Object defined dielectric>');
                 set('index', n_groove);
+        }
         }
     ";
     
