@@ -24,14 +24,14 @@ function toss(value, ranges){
 n_AlO=1.65+1i*1e-4;
 n_in=1.5;
 n_out=1;
-nL=1.49+1i*1e-4;
+nL=1.65+1i*1e-4;
 nH=2.53+1i*1e-4;
 ntail=1.49;
 
 theta_lim = asin(n_out/n_in)/pi*180+0.5;
 theta = linspace(40,60,1e4);                    # angle vector10
 lambda=570e-9;
-N=11;
+N=12;
 
 kL=2*pi/lambda*real(nL)*cos(40/180*pi);
 kH=2*pi/lambda*real(nH)*cos(40/180*pi);
@@ -48,10 +48,10 @@ d_out=0e-6;
 
 best_parameters=matrix(7);
 best_parameters(1) = 0e-9;          # pmma thickness
-best_parameters(2) = dH_0*1.45;      # last titania layer thickness
-best_parameters(3) = 20e-9;          # AlO layer thicknes (etch stop layer)
-best_parameters(4) = 0.2*dH_0;       # second last titania layer (a layer below etch stop)
-best_parameters(5) = dL_0*0.75;      # last Silica layer
+best_parameters(2) = dH_0;      # last titania layer thickness
+best_parameters(3) = dL_0;          # AlO layer thicknes (etch stop layer)
+best_parameters(4) = dH_0;           # second last titania layer (a layer below etch stop)
+best_parameters(5) = dL_0;      # last Silica layer
 best_parameters(6) = dL_0;
 best_parameters(7) = dH_0;
 
@@ -71,6 +71,9 @@ P_old = Partition;
 i=2;
 j=0;
 tol=1;
+
+best_parameters = 1*best_parameters ;
+
 for (0; tol ; 0) {   # while loop
     i=i+1;
     j=j+1;
@@ -79,22 +82,23 @@ for (0; tol ; 0) {   # while loop
     }
     
     parameters = best_parameters ;
+
     value = best_parameters(i)*1e9;
     if (i==1) {             # pmma thickness
         rangee = value/2;
     } else if (i==2) {      # last titania layer thickness
         rangee = value/2;        
     } else if (i==3) {      # AlO layer thicknes (etch stop layer)
-        value = 80;
-        rangee = 130;        
+        #value = 80;
+        rangee = value/2;        
     } else if (i==4) {      # second last titania layer (a layer below etch stop)
         rangee = value*2;        
     } else if (i==5) {      # last Silica layer
         rangee = value/2;        
     } else if (i==6) {
-        rangee = value*0.1;        
+        rangee = value*0.4;        
     } else if (i==7) {
-        rangee = value*0.1;        
+        rangee = value*0.4;        
     }
     parameters(i)=toss(value,rangee)*1e-9;
     
@@ -106,14 +110,14 @@ for (0; tol ; 0) {   # while loop
     dL = parameters(6);
     dH = parameters(7);
     
-    n1(1) = n_in;
-    n1(2:2:2*N) = nH;
-    n1(3:2:2*N+1) = nL;
-    n1(end-4) = nH;
-    n1(end-3) = n_AlO;
-    n1(end-2) = nH;
-    n1(end-1) = ntail;
-    n1(end) = n_out;
+    #n1(1) = n_in;
+    #n1(2:2:2*N) = nH;
+    #n1(3:2:2*N+1) = nL;
+    #n1(end-4) = nH;
+    #n1(end-3) = n_AlO;
+    #n1(end-2) = nH;
+    #n1(end-1) = ntail;
+    #n1(end) = n_out;
     
     n2(1) = n_in;
     n2(2:2:2*N) = nH;
@@ -130,15 +134,15 @@ for (0; tol ; 0) {   # while loop
     n3(end-1) = n_AlO;
     n3(end) = n_out;
     
-    d1(1) = 1e-6;
-    d1(2:2:2*N) = dH;
-    d1(3:2:2*N+1) = dL;
-    d1(end-5) = dlastSilica;
-    d1(end-4) = dsecondlastTitania;
-    d1(end-3) = dAlO;
-    d1(end-2) = dlastTitania;
-    d1(end-1) = tail;
-    d1(end) = d_out;
+    #d1(1) = 1e-6;
+    #d1(2:2:2*N) = dH;
+    #d1(3:2:2*N+1) = dL;
+    #d1(end-5) = dlastSilica;
+    #d1(end-4) = dsecondlastTitania;
+    #d1(end-3) = dAlO;
+    #d1(end-2) = dlastTitania;
+    #d1(end-1) = tail;
+    #d1(end) = d_out;
     
     d2(1) = 1e-6;
     d2(2:2:2*N) = dH;
@@ -180,44 +184,47 @@ for (0; tol ; 0) {   # while loop
     #contrast1a=n_eff1-n_eff2;
     #contrast1b=n_eff1/n_eff2;
     
-    contrast2a=n_eff3-n_eff2;
+    contrast2a=abs(n_eff3-n_eff2);
     contrast2b=n_eff3/n_eff2;
     
     # various contributions to the partition function
-    min_a=0.109;
-    max_a=0.125;
-    min_b=1.100;
-    max_b=1.125;
+    min_a=0.090;
+    max_a=0.115;
+    min_b=1.090;
+    max_b=1.115;
     P(1) = 1; #threshold(contrast1a,min_a,max_a);
     P(2) = threshold(contrast2a,min_a,max_a);
     P(3) = 1; #threshold(contrast1b,min_b,max_b);
     P(4) = threshold(contrast2b,min_b,max_b);
      
     min_r = 0.20;
-    max_r = 0.30;
+    max_r = 0.40;
     P(5)=1; #threshold(1-r1(idx1),min_r,max_r);
     P(6)=threshold(1-r2(idx2),min_r,max_r);
+    #max_r = 0.50;
     P(7)=threshold(1-r3(idx3),min_r,max_r);
     
     min_H = 800;
-    max_H = 1200;
+    max_H = 1000;
     P( 8) = 1;# threshold(H1,min_r,max_r);
-    P( 9) = threshold(H2,min_r,max_r)*2;
-    P(10) = threshold(H3,min_r,max_r)*2;
+    P( 9) = threshold(H2,min_r,max_r);
+    #max_H = 2000;
+    P(10) = threshold(H3,min_r,max_r);
     
     P_new = prod(P);
-    if (P_new > P_old and theta(idx1) > theta_lim and theta(idx2) > theta_lim and theta(idx3) > theta_lim) {
+    if (P_new > P_old and theta(idx2) > theta_lim and theta(idx2) > theta_lim and theta(idx3) > theta_lim) {
         P_old = Partition;
         Partition = P_new;
         best_parameters = parameters;
         ?j;
-        if (P(1)>0.8 and P(2)>0.8 and P(5)>0.9 and P(6)>0.9 and P(7)>0.9 and P(8)>0.3 and P(9)>0.3 and P(10)>0.3 ) {
-            tol=0;
-        }
         closeall;
-        plot(theta,r2,r2,r3);
+        plot(theta,r2,r3);
+        #if (P(1)>0.8 and P(2)>0.8 and P(5)>0.9 and P(6)>0.9 and P(7)>0.9 and P(8)>0.3 and P(9)>0.5 and P(10)>0.5 ) {
+            #tol=0;
+        #}
     }
+    if (j==400) {tol=0;}
 }
 
 #matlabsave('best_param',best_parameters);
-savedata('best_param',best_parameters);
+savedata('best_param3',best_parameters);

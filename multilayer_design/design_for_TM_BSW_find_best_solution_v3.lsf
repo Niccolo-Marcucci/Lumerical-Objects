@@ -49,9 +49,9 @@ d_out=0e-6;
 start_parameters=matrix(7);
 start_parameters(1) = 75e-9;          # pmma thickness
 start_parameters(2) = dH_0*1.45;      # last titania layer thickness
-start_parameters(3) = 20e-9;          # AlO layer thicknes (etch stop layer)
-start_parameters(4) = 0.2*dH_0;       # second last titania layer (a layer below etch stop)
-start_parameters(5) = dL_0*0.75;      # last Silica layer
+start_parameters(3) = dL_0;          # AlO layer thicknes (etch stop layer)
+start_parameters(4) = 0;#0.2*dH_0;       # second last titania layer (a layer below etch stop)
+start_parameters(5) = 0;#dL_0*0.75;      # last Silica layer
 start_parameters(6) = dL_0;
 start_parameters(7) = dH_0;
 
@@ -184,10 +184,10 @@ for (0; tol ; 0) {   # while loop
     contrast2b=n_eff3/n_eff2;
     
     # various contributions to the partition function
-    min_a=0.109;
-    max_a=0.125;
+    min_a=0.100;
+    max_a=0.118;
     min_b=1.100;
-    max_b=1.125;
+    max_b=1.118;
     P(1) = 1;#threshold(contrast1a,min_a,max_a);
     P(2) = threshold(contrast2a,min_a,max_a);
     P(3) = 1;#threshold(contrast1b,min_b,max_b);
@@ -195,14 +195,16 @@ for (0; tol ; 0) {   # while loop
      
     min_r = 0.20;
     max_r = 0.30;
-    P(6)=threshold(1-r2(idx2),min_r,max_r);
     P(5)=1;#threshold(1-r1(idx1),min_r,max_r);
+    P(6)=threshold(1-r2(idx2),min_r,max_r);
+    max_r = 0.50;
     P(7)=threshold(1-r3(idx3),min_r,max_r);
     
-    min_H = 800;
+    min_H = 8000;
     max_H = 1000;
     P( 8) = 1;#threshold(H1,min_r,max_r);
     P( 9) = threshold(H2,min_r,max_r);
+    max_H = 2000;
     P(10) = threshold(H3,min_r,max_r);
     
     P_new = prod(P);
