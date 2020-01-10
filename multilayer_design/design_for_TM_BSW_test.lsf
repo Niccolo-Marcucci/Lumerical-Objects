@@ -15,7 +15,7 @@ loaddata('best_param'+num2str(kkk));
 parameters = best_parameters;
 ?parameters;
 tail = parameters(1);
-dlastTitania = 47e-9; #parameters(3);
+dlastTitania = 50e-9; #parameters(3);
 dAlO = 55e-9; #parameters(3);
 dsecondlastTitania = 20e-9; #parameters(4);
 dlastSilica = 130e-9; #parameters(5);
