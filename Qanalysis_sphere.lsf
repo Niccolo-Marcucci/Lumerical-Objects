@@ -1,0 +1,50 @@
+
+addanalysisgroup;
+set('name','Quality analysis sphere');
+set('x',0);
+set('y',0);
+set('z',0);
+    adduserprop('N monitors',0,10);	               # number of rings in the DBR 
+    adduserprop('radius',2,1e-6);	               # diameter of the central cavity
+    adduserprop('monitors at boundaries',0,0);        
+    adduserprop('domain dimensions',0,2);              # 1D, 2D or 3D?
+    
+    myscript= "
+        deleteall;
+        
+        N = %N monitors%;
+        
+        randreset(435);
+        
+        # add monitors with random position
+        for(i=1:N) {  
+            
+            if (%monitors at boundaries%) {  
+                r = %radius%;  
+                theta = 2*pi*(i-1+rand)/N;
+                phi = pi*(i-1+rand)/N;
+            } else {
+                r = %radius%*rand; 
+                theta = 2*pi*rand;
+                phi = pi*rand;
+            }     
+            
+            if (%domain dimensions% < 3) {  phi = 0;  }
+            if (%domain dimensions% < 2) {  theta = 0;  }
+            
+            addtime;
+            set('name','t'+num2str(i));
+            set('x',r*cos(theta)*cos(phi));
+            set('y',r*sin(theta)*cos(phi));
+            set('z',r*sin(phi));
+        }
+    ";
+    
+set('setup script',myscript); 
+    
+    addanalysisprop('number of resonances',0,1); 
+    addanalysisprop('make plots',0,1); 
+    addanalysisresult('spectrum');
+    addanalysisresult('Q');
+    
+set('analysis script',read("Qanalysis-analysis_script.lsf")); 

@@ -1,0 +1,191 @@
+##############################################
+# Q analysis
+# This script calculates the quality factor from
+# the slope of the decaying envelope.
+#
+# Input properties
+# make plots: make plots of signal, envelope, slope, spectrum
+#             1 for yes, 0 for no
+# number resonances: number of resonances to look for
+#
+# Output properties 
+# f0: vector of resonant frequencies
+# Q: vector of Q factors of resonances
+# delta_Q: error in Q factor
+#
+# Tags: resonator high q analysis quality factor
+#
+# Copyright 2012 Lumerical Solutions Inc
+##############################################
+
+# simplify input variable names by removing spaces
+number_resonances = %number of resonances%;
+make_plots = %make plots%;
+
+min_filter_width = 1; # min width of filter in units of resonance FWHM
+max_filter_width = 6; # min width of filter in units of resonance FWHM
+filter_width_test_points = 20;
+zero_pad = 2^16; # fft zero padding
+                 # Note fft zero pad should be a power of 2, 
+                 # and larger gives more resolution in the 
+                 #frequency domain.
+
+for(N=0; (N+1) <= %N monitors%; 0) { 
+N=N+1;} # up to the sum of # of monitors = (nx*ny*nz)
+
+#################################################
+# get the monitor data for the first monitor
+#################################################
+t = getdata("t1","t");
+field0_t_Ex = pinch(getdata("t1","Ex"));
+field0_t_Ey = pinch(getdata("t1","Ey"));
+field0_t_Ez = pinch(getdata("t1","Ez"));
+
+#################################################
+# do fft to frequency domain for all monitors
+#################################################
+w = fftw(t,1,zero_pad);
+field_w = matrix(length(w),6*N);
+for(i=1:N) {
+  mname = "t" + num2str(i);
+  for(j=1:6) {
+    if(almostequal(j,1)) { component = "Ex"; }
+    if(almostequal(j,2)) { component = "Ey"; }
+    if(almostequal(j,3)) { component = "Ez"; }
+    if(almostequal(j,4)) { component = "Hx"; }
+    if(almostequal(j,5)) { component = "Hy"; }
+    if(almostequal(j,6)) { component = "Hz"; }
+    if(j > 3.5) { extra_factor = sqrt(mu0/eps0); }
+    else { extra_factor = 1; }
+    if(havedata(mname,component)) {
+    
+      field_w(1:length(w),6*(i-1)+j) = 2*extra_factor*( (1:length(w)) <= (length(w)/2+0.1)) * 
+                                       fft(pinch(getdata(mname,component)),1,zero_pad);
+    }
+  }
+}
+
+
+#################################################
+# find resonant peaks, including all monitors
+#################################################
+f_spectrum = sum(abs(field_w)^2,2);
+
+p = findpeaks(f_spectrum,number_resonances);
+f0 = w(p)/(2*pi);
+
+#################################################
+# find quality factors
+#################################################
+
+# reserve memory for results
+peak_spectra = matrix(length(w),number_resonances);
+peak_filters2 = matrix(length(w),number_resonances);
+
+# calculate slope of decay using 40-60% of time signal
+tp1 = round(0.4*length(t));
+tp2 = round(0.6*length(t));
+t2 = t(tp1:tp2);
+log_field_all = matrix(tp2-tp1+1,number_resonances);
+
+Q = matrix(number_resonances);
+delta_Q = matrix(number_resonances)+1e300;
+
+# loop over each peak 
+for(i=1:number_resonances) {
+    # find FWHM of peak
+    peak_val = f_spectrum(p(i));
+    continue_search = 1;
+    for(p1=p(i)-1; (p1>1) & continue_search ; 1) {
+        if(f_spectrum(p1)<=peak_val/2) { 
+            continue_search = 0; 
+        } else {
+            p1 = p1-1;
+        }
+    }
+    continue_search = 1;
+    for(p2=p(i)+1; (p2<length(w))& continue_search; 1) {
+        if(f_spectrum(p2)<=peak_val/2) { 
+            continue_search = 0; 
+        } else {
+            p2 = p2+1;
+        }
+    }
+    if(p1 < 1) { p1 = 1; }
+    if(p2 > length(w)) { p2 = length(w); }
+    FWHM = w(p2)-w(p1);
+
+    for(filter_width=linspace(min_filter_width,max_filter_width,filter_width_test_points)) {
+        # calculate the filter for the peak
+        peak_filter = exp( -0.5*(w-w(p(i)))^2/(filter_width*FWHM)^2 );
+ 
+        # inverse fft to get data in time domain
+        field2_t = 0;
+        for(mcount=1:6*N) { 
+            field2_t = field2_t + abs(invfft(pinch(field_w,2,mcount)*peak_filter))^2;
+        }
+        field2_t = field2_t(tp1:tp2);
+        log_field = log10(abs(field2_t));
+
+        # calculate slope and Q from the slope of the decay
+        # estimate error from the slope
+        slope = (log_field(2:length(t2))-log_field(1:length(t2)-1))/
+            (t(2:length(t2))-t(1:length(t2)-1));
+        slope_mean = sum(slope)/length(slope);
+        slope_delta = sqrt( sum((slope-slope_mean)^2)/length(slope) );
+        Q_test = -w(p(i))*log10(exp(1))/(slope_mean);
+        delta_Q_test = abs(slope_delta/slope_mean*Q_test);
+        if(delta_Q_test < delta_Q(i)) {
+            Q(i) = Q_test;
+            delta_Q(i) = delta_Q_test;
+
+            # collect data for final plot
+            peak_spectra(1:length(w),i) = f_spectrum * peak_filter^2;
+            peak_filters2(1:length(w),i) = peak_filter^2;
+            log_field_all(1:length(t2),i) = log_field;
+
+        }
+    }
+    # output summary of peak results to script window
+    ?"Resonance " + num2str(i) + ":";
+    ?"    frequency = " + num2str(w(p(i))/(2*pi)*1e-12) + "THz, or "+num2str(2*pi*c/w(p(i))*1e9)+" nm";
+    ?"    Q = " + num2str(Q(i)) +" +/- " + num2str(delta_Q(i));
+}
+
+Q_matrix=Q;
+
+Q = matrixdataset("Q");
+Q.addparameter("lambda",c/f0,"f",f0);
+Q.addattribute("Q",Q_matrix);
+Q.addattribute("dQ",delta_Q);
+
+spectrum = matrixdataset("spectrum");
+spectrum.addparameter("lambda",c/(w/2/pi),"f",w/2/pi);
+spectrum.addattribute("spectrum",f_spectrum);
+
+#################################################
+# plot the results
+#################################################
+if (make_plots) {
+  # plot signal and envelope for first monitor 
+  field_t_Ex = invfft(pinch(field_w,2,1));
+  field_t_Ex = field_t_Ex(1:length(t));
+  field_t_Ey = invfft(pinch(field_w,2,2));
+  field_t_Ey = field_t_Ey(1:length(t));
+  field_t_Ez = invfft(pinch(field_w,2,3));
+  field_t_Ez = field_t_Ez(1:length(t));
+  plot(t*1e15,field0_t_Ex,abs(field_t_Ex),field0_t_Ey,abs(field_t_Ey),field0_t_Ez,abs(field_t_Ez),"time (fs)","field envelope");
+  legend("field (Ex)","envelope (Ex)","field (Ey)","envelope (Ey)","field (Ez)","envelope (Ez)");
+
+  # plot the slopes of the decaying fields
+  plot(t2*1e15,log_field_all,"time (fs)","log10(|field(t)|)","Decay for each resonance");
+
+  # plot spectra
+  p1 = find(w,0.8*min(w(p)));
+  p2 = find(w,1.2*max(w(p)));
+  f = w/(2*pi);
+  plot(f(p1:p2)*1e-12,peak_spectra(p1:p2,1:number_resonances)/max(f_spectrum)
+                     ,"frequency (THz)","Arbitrary units","Spectrum of resonances");
+  plot(f(p1:p2)*1e-12,f_spectrum(p1:p2)/max(f_spectrum),peak_filters2(p1:p2,1:number_resonances)
+                     ,"frequency (THz)","Arbitrary units","Spectrum and filters");
+}  
