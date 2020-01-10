@@ -24,7 +24,7 @@ function toss(value, ranges){
 n_AlO=1.65+1i*1e-4;
 n_in=1.5;
 n_out=1;
-nL=1.49+1i*1e-4;
+nL=1.65+1i*1e-4;
 nH=2.53+1i*1e-4;
 ntail=1.49;
 
@@ -55,8 +55,9 @@ start_parameters = matrix(7);
 #start_parameters(5) = dL_0*0.75;      # last Silica layer
 #start_parameters(6) = dL_0;
 #start_parameters(7) = dH_0;
-loaddata('best_param');
+loaddata('best_param5');
 start_parameters = best_parameters;
+    parameters=start_parameters;
 # N high-low couples + one for substrate, one for air, one for the pmma layer, one for last titania
 # one for allumina protective layer and one for second last titania.
 N_layers=2*N+6;   
@@ -71,21 +72,22 @@ P=matrix(10);
 Partition = 0 ; 
 P_old = Partition;
 i=0;
-step = 1/10;
+step = 1/100;
+
 #for (parameters(1)=start_parameters(1)*0.5 ; parameters(1)<start_parameters(1)*1.5 ; parameters(1)=parameters(1)+start_parameters(1)*step) { 
-#for (parameters(2)=start_parameters(2)*1 ; parameters(2)<start_parameters(2)*1.5 ; parameters(2)=parameters(2)+start_parameters(2)*step) { 
+#for (parameters(2)=start_parameters(2)*1 ; parameters(2)<start_parameters(2)*1.5 ; parameters(2)=parameters(2)+start_parameters(2)/3) { 
 #for (parameters(3)=15e-9                   ; parameters(3)<130e-9                  ; parameters(3)=parameters(3)+130e-9*step) { 
 #for (parameters(4)=start_parameters(4)*0   ; parameters(4)<start_parameters(4)*2   ; parameters(4)=parameters(4)+start_parameters(4)*step) { 
 #for (parameters(5)=start_parameters(5)*0.5 ; parameters(5)<start_parameters(5)*1.5 ; parameters(5)=parameters(5)+start_parameters(5)*step) { 
-#for (parameters(6)=start_parameters(6)*0.9 ; parameters(6)<start_parameters(6)*1.1 ; parameters(6)=parameters(6)+start_parameters(6)*1e-1) { 
-#for (parameters(7)=start_parameters(7)*0.9 ; parameters(7)<start_parameters(7)*1.1 ; parameters(7)=parameters(7)+start_parameters(7)*1e-1) { 
+for (parameters(6)=start_parameters(6)*1; parameters(6)<start_parameters(6)*1.2 ; parameters(6)=parameters(6)+start_parameters(6)*step) { 
+for (parameters(7)=start_parameters(7)*1 ; parameters(7)<start_parameters(7)*1.2 ; parameters(7)=parameters(7)+start_parameters(7)*step) { 
     
     i=i+1;
     tail = parameters(1);
     dlastTitania = parameters(2);
     dAlO = parameters(3);
     dsecondlastTitania = parameters(4);
-    dlastSilica = parameters(5);
+    dlastSilica = parameters(6);
     dL = parameters(6);
     dH = parameters(7);
     
@@ -147,12 +149,12 @@ step = 1/10;
     #H1=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;
     RT = stackrt(n2,d2,c/lambda,theta);
     idx2=findpeaks(1-RT.Rp);
-    r2=1-RT.Rp;
+    r2=RT.Rp;
     field = stackfield(n2,d2,c/lambda,theta(idx2),1,sum(d2),sum(d2));
     H2=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;
     RT = stackrt(n3,d3,c/lambda,theta);
     idx3=findpeaks(1-RT.Rp);
-    r3=1-RT.Rp;
+    r3=RT.Rp;
     field = stackfield(n3,d3,c/lambda,theta(idx3),1,sum(d3),sum(d3));
     H3=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;
     
@@ -163,30 +165,30 @@ step = 1/10;
     #contrast1a=n_eff1-n_eff2;
     #contrast1b=n_eff1/n_eff2;
     
-    contrast2a=n_eff3-n_eff2;
-    contrast2b=n_eff3/n_eff2;
+    contrast2a=n_eff2-n_eff3;
+    contrast2b=n_eff2/n_eff3;
     
     # various contributions to the partition function
-    min_a=0.109;
-    max_a=0.125;
+    min_a=0.100;
+    max_a=0.120;
     min_b=1.100;
-    max_b=1.125;
+    max_b=1.120;
     P(1) = 1; #threshold(contrast1a,min_a,max_a);
-    P(2) = threshold(contrast2a,min_a,max_a);
+    P(2) = 1; #threshold(contrast2a,min_a,max_a);
     P(3) = 1; #threshold(contrast1b,min_b,max_b);
-    P(4) = threshold(contrast2b,min_b,max_b);
+    P(4) = 1; #threshold(contrast2b,min_b,max_b);
      
     min_r = 0.25;
     max_r = 0.40;
     P(5)=1;#threshold(r1(idx1),min_r,max_r);
     P(6)=threshold(r2(idx2),min_r,max_r);
-    P(7)=2*threshold(r3(idx3),min_r,max_r);
+    P(7)=threshold(r3(idx3),min_r,max_r);
     
     min_H = 900;
     max_H = 2000;
     P( 8) = 1; #threshold(H1,min_r,max_r);
     P( 9) = threshold(H2,min_r,max_r);
-    P(10) = 2*threshold(H3,min_r,max_r);
+    P(10) = threshold(H3,min_r,max_r);
     
     P_new = prod(P);
     if (P_new > P_old and theta(idx2) > theta_lim and theta(idx2) > theta_lim and theta(idx3) > theta_lim) {
@@ -195,9 +197,9 @@ step = 1/10;
         Partition = P_new;
         best_parameters = parameters;
         closeall;
-        plot(theta,r1,r2,r3);
+        plot(theta,r2,r3);
     }
-#}}}}#}}}
+}}#}#}#}}}
 
 #matlabsave('best_param',best_parameters);
-savedata('best_param',best_parameters);
+savedata('best_param6',best_parameters);
