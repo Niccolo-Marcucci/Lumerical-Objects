@@ -76,3 +76,13 @@ for(i=1:length(p)) {
   ?"  wavelength = " + num2str(lambda0(i)*1e9) + " nm";
   ?"  frequency  = " + num2str(f0(i)*1e-12) + " THz";
 }
+
+peak = spectrum(p(1));
+min_s =     min(abs(spectrum(1:p(1))- peak/2));
+min_idx = find((abs(spectrum(1:p(1))- peak/2) == min_s));
+max_s =     min(abs(spectrum(p(1):end)- peak/2));
+max_idx = p(1) + find((abs(spectrum(p(1):end)- peak/2) == max_s));
+?lambda(min_idx);
+?lambda(max_idx);
+?abs(lambda(min_idx) -lambda(max_idx));
+Q = lambda0(1)/abs(lambda(min_idx) -lambda(max_idx));
