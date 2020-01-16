@@ -30,6 +30,7 @@ set('z',0);
         lambda = %dbr period%;
         n_arms = %topological charge%;
         FF = %fill factor%;
+        D=start_radius*2;
         
         resolution = 2*resolution*n_rings;  # even value required
         
@@ -42,8 +43,9 @@ set('z',0);
         the=matrix(int_res);
         vert=matrix(2,int_res);
         
-        # Each arm opf the spiral is defined by a polygon 
-        for (j=0:abs(n_arms)-1) { 
+        if (n_arms != 0) {
+           # Each arm opf the spiral is defined by a polygon 
+           for (j=0:abs(n_arms)-1) { 
               # define theta   
               theta(1:resolution/2) = linspace(0,2*pi*n_rings/n_arms,resolution/2);
               theta((resolution/2+1):resolution) = linspace(2*pi*n_rings/n_arms,0,resolution/2);
@@ -78,6 +80,25 @@ set('z',0);
                   set('z min', %z min%);
                   set('z max', %z min%+thickness);
               }
+           }
+        } else {
+           if (n_rings!=0) {
+           for (n = 1:n_rings){
+                addring;
+                set('name','groove' + num2str(n));
+                set('x',0);
+                set('y',0);
+                set('inner radius',D/2+(n-1)*lambda);
+                set('outer radius',D/2+(n-0.5)*lambda);
+                set('z min',%z min%);
+                set('z max',%z min%+thickness);
+                set('material',material_out);
+                if(get('material')=='<Object defined dielectric>') 
+                    { set('index',index_out); }
+                set('theta start',0);
+                set('theta stop',360);
+                set('index', index_out);
+            }}
         }
     ";
     
