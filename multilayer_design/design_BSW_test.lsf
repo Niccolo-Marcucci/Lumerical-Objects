@@ -4,21 +4,26 @@ clear;
 theta = linspace(40,56,10000);                    # angle vector
 lambda=570e-9;
 
+n_Ti2O2=2.53+1i*1e-4;
 n_AlO=1.65+1i*1e-4;
-n_in=1.46;
-n_out=1;
-nL=1.65+1i*1e-4;
-nH=2.53+1i*1e-4;
-ntail=1.48;
+n_SiO2=1.46;
+n_pmma=1.48+1i*1e-4;
+n_TaO5=2.08+1i*1e-4;
 
-loaddata('best_param'+'XX');#num2str(kkk)
+n_in=n_SiO2;
+n_out=1;
+nL=n_AlO;
+nH=n_Ti2O2;
+ntail=n_pmma;
+
+loaddata('best_param'+'TM');#num2str(kkk)
 parameters = best_parameters;
 ?parameters;
-tail = 0; #parameters(1);
-dlastTitania = 38e-9; #parameters(3);#
-dAlO = 55e-9; #parameters(3);#
-dsecondlastTitania = 30e-9; #parameters(4);#
-dlastSilica = 130e-9; #parameters(5);
+tail = parameters(1);
+dlastTitania = parameters(2);#
+dAlO = parameters(3);#
+dsecondlastTitania = parameters(4);#
+dlastSilica = parameters(5);
 dL = parameters(6);
 dH = parameters(7);
 
@@ -98,4 +103,4 @@ plot(z,real(nz)*400);
         selectfigure(1);
 
 
-savedata('best_design_TM',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
+#savedata('best_design_TE',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
