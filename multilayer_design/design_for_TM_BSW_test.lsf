@@ -50,7 +50,7 @@ for (i=1:3){
     d(3:2:2*N+1) = dL;
     d(end-5) = dlastSilica;
     d(end-4) = dsecondlastTitania;
-    d(end-3) = dAlO;
+    d(end-3) = dAlO*1.1;
     d(end-2) = dlastTitania;
     d(end-1) = tail;
     d(end) = 5e6;
@@ -98,4 +98,4 @@ plot(z,real(nz)*400);
         selectfigure(1);
 
 }
-savedata('best_design',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
+#savedata('best_design',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
