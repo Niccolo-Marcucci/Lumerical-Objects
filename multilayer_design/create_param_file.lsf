@@ -1,0 +1,22 @@
+loaddata('good_parameters_collection/best_param'+num2str(10));
+parameters = best_parameters;
+?parameters;
+tail = 0; #parameters(1);
+dlastTitania = 50e-9; #parameters(3);
+dAlO = 55e-9; #parameters(3);
+dsecondlastTitania = 20e-9; #parameters(4);
+dlastSilica = 130e-9; #parameters(5);
+dL = parameters(6);
+dH = parameters(7);
+
+parameters(1) = tail;
+parameters(2) = dlastTitania;
+parameters(3) = dAlO;
+parameters(4) = dsecondlastTitania;
+parameters(5) = dlastSilica;
+parameters(6) = dL;
+parameters(7) = dH;
+?parameters;
+best_parameters = parameters;
+
+savedata('best_paramXX',best_parameters);
