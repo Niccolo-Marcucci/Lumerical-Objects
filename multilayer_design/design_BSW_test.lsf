@@ -8,15 +8,15 @@ n_Ti2O2=2.53+1i*1e-4;
 n_AlO=1.65+1i*1e-4;
 n_SiO2=1.46;
 n_pmma=1.48+1i*1e-4;
-n_TaO5=2.08+1i*1e-4;
+n_Ta2O5=2.08+1i*1e-4;
 
 n_in=n_SiO2;
 n_out=1;
-nL=n_AlO;
-nH=n_Ti2O2;
+nL=n_SiO2+1i*1e-4;
+nH=n_Ta2O5;
 ntail=n_pmma;
 
-loaddata('best_param'+'TM');#num2str(kkk)
+loaddata('best_param'+'TE');#num2str(kkk)
 parameters = best_parameters;
 ?parameters;
 tail = parameters(1);
@@ -27,7 +27,7 @@ dlastSilica = parameters(5);
 dL = parameters(6);
 dH = parameters(7);
 
-N=11;
+N=7;
 
 
 
