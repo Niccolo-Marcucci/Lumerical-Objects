@@ -12,11 +12,11 @@ n_Ta2O5=2.08+1i*1e-4;
 
 n_in=n_SiO2;
 n_out=1;
-nL=n_SiO2+1i*1e-4;
-nH=n_Ta2O5;
-ntail=n_pmma;
+nL=n_AlO;
+nH=n_Ti2O2;
+ntail=1;
 
-loaddata('best_param'+'TE');#num2str(kkk)
+loaddata('best_param'+'XX');#num2str(kkk)
 parameters = best_parameters;
 ?parameters;
 tail = parameters(1);
@@ -27,7 +27,7 @@ dlastSilica = parameters(5);
 dL = parameters(6);
 dH = parameters(7);
 
-N=7;
+N=11;
 
 
 
