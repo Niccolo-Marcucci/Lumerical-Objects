@@ -16,7 +16,7 @@ nL=n_AlO;
 nH=n_Ti2O2;
 ntail=1;
 
-loaddata('best_param'+'XX');#num2str(kkk)
+loaddata('best_param'+'TM');#num2str(kkk)
 parameters = best_parameters;
 ?parameters;
 tail = parameters(1);
@@ -103,4 +103,4 @@ plot(z,real(nz)*400);
         selectfigure(1);
 
 
-#savedata('best_design_TE',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
+savedata('best_design_TM',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);

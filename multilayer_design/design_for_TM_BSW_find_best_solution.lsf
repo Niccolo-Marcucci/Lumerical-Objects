@@ -21,17 +21,22 @@ function toss(value, ranges){
 }
 
 
+n_Ti2O2=2.53+1i*1e-4;
 n_AlO=1.65+1i*1e-4;
-n_in=1.5;
+n_SiO2=1.46;
+n_pmma=1.48+1i*1e-4;
+n_Ta2O5=2.08+1i*1e-4;
+
+n_in=n_SiO2;
 n_out=1;
-nL=1.65+1i*1e-4;
-nH=2.53+1i*1e-4;
-ntail=1.49;
+nL=n_AlO;
+nH=n_Ti2O2;
+ntail=1;
 
 theta_lim = asin(n_out/n_in)/pi*180+0.5;
 theta = linspace(40,60,1e4);                    # angle vector10
 lambda=570e-9;
-N=11;
+N=8;
 
 kL=2*pi/lambda*real(nL)*cos(40/180*pi);
 kH=2*pi/lambda*real(nH)*cos(40/180*pi);
@@ -51,7 +56,7 @@ best_parameters(1) = 0e-9;          # pmma thickness
 best_parameters(2) = dH_0;          # last titania layer thickness
 best_parameters(3) = dL_0;          # AlO layer thicknes (etch stop layer)
 best_parameters(4) = dH_0;          # second last titania layer (a layer below etch stop)
-best_parameters(5) = dL_0;      # last Silica layer
+best_parameters(5) = dL_0;          # last Silica layer
 best_parameters(6) = dL_0;
 best_parameters(7) = dH_0;
 
@@ -73,7 +78,7 @@ j=0;
 tol=1;
 
 #best_parameters = 1*best_parameters ;
-loaddata('best_param7');
+loaddata('best_param3');
 for (0; tol ; 0) {   # while loop
     i=i+1;
     j=j+1;
@@ -215,7 +220,7 @@ for (0; tol ; 0) {   # while loop
     P(10) = threshold(H3,min_r,max_r);
     
     P_new = prod(P);
-    if (P_new > P_old and theta(idx2) > theta_lim and theta(idx2) > theta_lim and theta(idx3) > theta_lim) {
+        if (P_new > P_old and theta(idx2) > theta_lim and theta(idx2) > theta_lim and theta(idx3) > theta_lim) {
         P_old = Partition;
         Partition = P_new;
         best_parameters = parameters;
@@ -230,4 +235,4 @@ for (0; tol ; 0) {   # while loop
 }
 
 #matlabsave('best_param',best_parameters);
-savedata('best_param11',best_parameters);
+savedata('best_param4',best_parameters);
