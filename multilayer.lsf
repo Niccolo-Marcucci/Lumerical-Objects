@@ -1,7 +1,6 @@
 # This file creates a structure group with the multilayer and the substrate
 # The multilayer design will be determined by one vector of containg the refractive index 
 # of each layer and another one contanig the thickness of each layer.
-deleteall;
 addstructuregroup;
 set('name','multilayer');
 set('x',0);
