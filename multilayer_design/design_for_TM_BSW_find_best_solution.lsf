@@ -34,8 +34,8 @@ nA=n_AlO;
 nB=n_Ti2O2;
 ntail=1;
 
-theta_lim = asin(n_out/n_in)/pi*180+0.5;
-theta = linspace(40,60,1e4);                    # angle vector10
+theta_lim = asin(n_out/n_in)/pi*180+0.7;
+theta = linspace(40,56,1e4);                    # angle vector10
 lambda=570e-9;
 N=8;
 
@@ -46,18 +46,18 @@ period=pi*0.95/(kL*FF+kH*(1-FF));
 dA_0=period*FF;
 dB_0=period*(1-FF);
 # tail_0=
-# dlastTitania_0=
+# dlast_0=
 # dAlO_0=20e-9;
-# dsecondlastTitania_0=0.2*dB_0;
-# dlastSilica_0=dA_0*0.75;
-# d_out=0e-6;
+# dsecondlast_B_0=0.2*dB_0;
+# dsecondlast_A_0=dA_0*0.75;
+d_out=1e-6;
 
 best_parameters=matrix(7);
 best_parameters(1) = 0e-9;          # pmma thickness
-best_parameters(2) = dB_0;          # last titania layer thickness
-best_parameters(3) = dA_0;          # AlO layer thicknes (etch stop layer)
-best_parameters(4) = dB_0;          # second last titania layer (a layer below etch stop)
-best_parameters(5) = dA_0;          # last Silica layer
+best_parameters(2) = dA_0*0.7;      # last layer thickness
+best_parameters(3) = dA_0*0.3;      # AlO layer thicknes (etch stop layer)
+best_parameters(4) = dB_0;          # second last B-type layer (a layer below etch stop)
+best_parameters(5) = dA_0;          # second last A-type layer
 best_parameters(6) = dA_0;          # dielectric 1
 best_parameters(7) = dB_0;          # dielectric 2
 
@@ -76,34 +76,33 @@ P=matrix(10);
 Partition = 0;#length(P); 
 P_old = Partition;
 i=1;
-j=0;
 tol=1;
 
 # best_parameters = 1*best_parameters ;
-# loaddata('best_param3');
-for (0; tol ; 0) {   # while loop
+#loaddata('best_param1');
+for (j=0; j~=400 | tol==0; j=j+1) {
+    
     i=i+1;
-    j=j+1;
     if (i==8) {
         i=2;
     }
-    if (i==5) {
-        i=6;
-    }
+    #if (i==5) {             # last A layer is ignored in the research
+        #i=6;
+    #}
     
     parameters = best_parameters ;
 
     value = best_parameters(i)*1e9;
     if (i==1) {             # pmma thickness
         rangee = value/2;
-    } else if (i==2) {      # last titania layer thickness
+    } else if (i==2) {      # last layer thickness
         rangee = value/2;        
     } else if (i==3) {      # AlO layer thicknes (etch stop layer)
         #value = 80;
         rangee = value/2;        
-    } else if (i==4) {      # second last titania layer (a layer below etch stop)
+    } else if (i==4) {      # second last B layer (a layer below etch stop)
         rangee = value*2;        
-    } else if (i==5) {      # last Silica layer
+    } else if (i==5) {      # last A layer
         rangee = value/2;        
     } else if (i==6) {
         rangee = value*0.4;        
@@ -113,10 +112,10 @@ for (0; tol ; 0) {   # while loop
     parameters(i)=toss(value,rangee)*1e-9;
     
     tail = parameters(1);
-    dlastTitania = parameters(2);
+    dlast = parameters(2);      
     dAlO = parameters(3);
-    dsecondlastTitania = parameters(4);
-    dlastSilica = parameters(6);
+    dsecondlast_B = parameters(4);
+    dsecondlast_A = parameters(5);
     dA = parameters(6);
     dB = parameters(7);
     
@@ -134,7 +133,7 @@ for (0; tol ; 0) {   # while loop
     n2(3:2:2*N+1) = nA;
     n2(end-3) = nB;
     n2(end-2) = n_AlO;
-    n2(end-1) = nB;
+    n2(end-1) = n_SiO2+1i*1e-4;
     n2(end) = n_out;
     
     n3(1) = n_in;
@@ -147,27 +146,27 @@ for (0; tol ; 0) {   # while loop
     #d1(1) = 1e-6;
     #d1(2:2:2*N) = dB;
     #d1(3:2:2*N+1) = dA;
-    #d1(end-5) = dlastSilica;
-    #d1(end-4) = dsecondlastTitania;
+    #d1(end-5) = dsecondlast_A;
+    #d1(end-4) = dsecondlast_B;
     #d1(end-3) = dAlO;
-    #d1(end-2) = dlastTitania;
+    #d1(end-2) = dlast;
     #d1(end-1) = tail;
     #d1(end) = d_out;
     
     d2(1) = 1e-6;
     d2(2:2:2*N) = dB;
     d2(3:2:2*N+1) = dA;
-    d2(end-4) = dlastSilica;
-    d2(end-3) = dsecondlastTitania;
+    d2(end-4) = dsecondlast_A;
+    d2(end-3) = dsecondlast_B;
     d2(end-2) = dAlO;
-    d2(end-1) = dlastTitania;
+    d2(end-1) = dlast;
     d2(end) = d_out;
     
     d3(1) = 1e-6;
     d3(2:2:2*N) = dB;
     d3(3:2:2*N+1) = dA;
-    d3(end-3) = dlastSilica;
-    d3(end-2) = dsecondlastTitania;
+    d3(end-3) = dsecondlast_A;
+    d3(end-2) = dsecondlast_B;
     d3(end-1) = dAlO;
     d3(end) = d_out;
     
@@ -220,7 +219,7 @@ for (0; tol ; 0) {   # while loop
     P( 9) = threshold(H2,min_r,max_r);
     max_H = 1000;
     P(10) = threshold(H3,min_r,max_r);
-    
+
     P_new = prod(P);
         if (P_new > P_old and theta(idx2) > theta_lim and theta(idx2) > theta_lim and theta(idx3) > theta_lim) {
         P_old = Partition;
@@ -233,8 +232,7 @@ for (0; tol ; 0) {   # while loop
             #tol=0;
         #}
     }
-    if (j==400) {tol=0;}
 }
 
 #matlabsave('best_param',best_parameters);
-savedata('best_param4',best_parameters);
+savedata('best_param2',best_parameters);
