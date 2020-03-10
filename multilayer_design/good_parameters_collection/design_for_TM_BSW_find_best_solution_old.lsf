@@ -46,9 +46,13 @@ period=pi*0.95/(kL*FF+kH*(1-FF));
 dA_0=period*FF;
 dB_0=period*(1-FF);
 d_out=0e-6;
+# tail_0=
+# dlast_0=
+# dAlO_0=20e-9;
+# dsecondlast_B_0=0.2*dB_0;
+# dsecondlast_A_0=dA_0*0.75;
 
-best_parameters=matrix(8);
-best_index=matrix(6);
+best_parameters=matrix(13);
 best_parameters(1) = dB_0;          # pmma thickness
 best_parameters(2) = dA_0;          # last layer thickness
 best_parameters(3) = 20e-9;         # AlO layer thicknes (etch stop layer)
@@ -57,16 +61,6 @@ best_parameters(5) = dA_0;          # second last A-type layer
 best_parameters(6) = dA_0;          # dielectric 1
 best_parameters(7) = dB_0;          # dielectric 2
 
-best_index(1) = n_in;          # substrate refractive index
-best_index(2) = n_out;         # air refractive index
-best_index(3) = nA;           # first material refractive index
-best_index(4) = nB;           # second refractive index
-best_index(5) = nlast;        # first layer above AlO refractive index
-best_index(6) = ntail;        # second layer above AlO refractive index
-
-best_parameters(8) = N;            # number of layer couples in the lower stack
-
-# the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
 
 # N high-low couples + one for substrate, one for air, one for the pmma layer, one for last titania
 # one for allumina protective layer and one for second last titania.
@@ -78,6 +72,7 @@ n3 = matrix(N_layers-2); # without last titania
 d1 = matrix(N_layers);
 d2 = matrix(N_layers-1);
 d3 = matrix(N_layers-2);
+
 P=matrix(10);
 Partition = 0;#length(P); 
 P_old = Partition;
@@ -85,12 +80,12 @@ i=1;
 tol=1;
 Pm=matrix(11,400);
 # best_parameters = 1*best_parameters ;
-#loaddata('best_param5');
+loaddata('best_param5');
 for (j=1; j~=400 | tol==0; j=j+1) {
     
     i=i+1;
     if (i==8) {
-        i=1;
+        i=2;
     }
     if (i==3) {             # don't change AlO thickness
         i=4;
@@ -250,4 +245,4 @@ plot(1:400,Pm(2,:),Pm(4,:),Pm(5,:),Pm(7,:),Pm(8,:),Pm(10,:),Pm(11,:));
 plot(1:400,10^Pm(11,:));
 
 #matlabsave('best_param',best_parameters);
-savedata('best_param6',best_parameters,best_index);
+savedata('best_param6',best_parameters);

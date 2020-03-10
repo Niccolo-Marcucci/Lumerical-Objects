@@ -4,35 +4,30 @@ clear;
 theta = linspace(40,56,10000);                    # angle vector
 lambda=570e-9;
 
-n_Ti2O2=2.53+1i*1e-4;                          # high refractive index
-n_AlO=1.65+1i*1e-4;                            # low refractive index
-n_SiO2=1.46;                                   # low refractive index
+n_Ti2O2=2.53+1i*1e-4;
+n_AlO=1.65+1i*1e-4;
+n_SiO2=1.46;
 n_pmma=1.48+1i*1e-4;
-n_Ta2O5=2.08+1i*1e-4;                          # high refractive inde
+n_Ta2O5=2.08+1i*1e-4;
 
+n_in=n_SiO2;
+n_out=1;
+nL=n_SiO2+1i*1e-4;
+nH=n_Ta2O5;
+ntail=n_pmma;
 
-loaddata('best_param'+'6');#num2str(kkk)
+loaddata('best_param'+'TE');#num2str(kkk)
 parameters = best_parameters;
-indeces = best_index;
+?parameters;
 tail = parameters(1);
-dlast = parameters(2);
-dAlO = parameters(3);
-dsecondlast_B = parameters(4)*0.9;
-dsecondlast_A = parameters(5)*1;
-dA = parameters(6);
-dB = parameters(7);
+dlastTitania = parameters(2);#
+dAlO = parameters(3);#
+dsecondlastTitania = parameters(4);#
+dlastSilica = parameters(5);
+dL = parameters(6);
+dH = parameters(7);
 
-n_in = indeces(1);        
-n_out = indeces(2);       
-nA = indeces(3);          
-nB = indeces(4);          
-nlast = indeces(5);      
-ntail = indeces(6);       
-
-N = parameters(8);    
-
-# the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
-N=10;
+N=7;
 
 
 
@@ -44,24 +39,24 @@ n1 = matrix(N_layers);
 d  = matrix(N_layers);
 n_effective = matrix(3);
 n1(1) = n_in;
-n1(2:2:2*N) = nB;
-n1(3:2:2*N+1) = nA;
-n1(end-4) = nB;
+n1(2:2:2*N) = nH;
+n1(3:2:2*N+1) = nL;
+n1(end-4) = nH;
 n1(end-3) = n_AlO;
-n1(end-2) = nlast;
+n1(end-2) = nH;
 n1(end-1) = ntail;
 n1(end) = n_out;
 for (i=[1:3]){
     if(i==2){ tail = 0; }
-    if(i==3){ dlast = 0;}
+    if(i==3){ dlastTitania = 0;}
     
     d(1) = 1e-6;
-    d(2:2:2*N) = dB;
-    d(3:2:2*N+1) = dA;
-    d(end-5) = dsecondlast_A;
-    d(end-4) = dsecondlast_B;
+    d(2:2:2*N) = dH;
+    d(3:2:2*N+1) = dL;
+    d(end-5) = dlastSilica;
+    d(end-4) = dsecondlastTitania;
     d(end-3) = dAlO;
-    d(end-2) = dlast;
+    d(end-2) = dlastTitania;
     d(end-1) = tail;
     d(end) = 5e6;
     
@@ -69,15 +64,15 @@ for (i=[1:3]){
     
     #image(RT1.theta,RT1.lambda*1e6,transpose(RT1.Rp),"theta (deg)","wavelength (um)","Rp, dispersive example");    
     
-    idx=findpeaks(1-RT1.Rp);
+    idx=findpeaks(1-RT1.Rs);
     field = stackfield(n1,d,c/lambda,theta(idx),1e4,0,7e-6);
-    H=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;#
+    H=abs(pinch(sqrt(field.Es(1,1,:,1,1,1)^2+field.Es(1,1,:,1,1,2)^2+field.Es(1,1,:,1,1,3)^2)))^2;#
     z=field.z;
     
     if (i==1) { 
         n_eff1 = sin(theta(idx)*pi/180)*n_in;
         idx_layers = n1;
-        ?d_layers = d;
+        d_layers = d;
         nz = n1(1)*ones(length(z));
         for (i=1:length(z)) {
             for (j=2:length(d)) {
@@ -86,7 +81,7 @@ for (i=[1:3]){
                 }
             }
         }
-        plot(theta,RT1.Rp); 
+        plot(theta,RT1.Rs,RT1.Ts); 
         selectfigure(2);
         plot(z,H);
     } else {
@@ -94,7 +89,7 @@ for (i=[1:3]){
         else {    n_eff3 = sin(theta(idx)*pi/180)*n_in; 
         selectfigure(1);
         holdon;
-        plot(theta,RT1.Rp); 
+        plot(theta,RT1.Rs,RT1.Ts); 
         selectfigure(2);
         holdon;
         plot(z,H);
@@ -106,22 +101,6 @@ selectfigure(2);
 holdon;
 plot(z,real(nz)*400);
         selectfigure(1);
-        
-N_l=length(d_layers);
-for (i=1;i<N_l;i=i+1){
-    N_l=length(d_layers);
-    if (d_layers(i)==0){
-        d_new=matrix(N_l-1);
-        idx_new=matrix(N_l-1);
-        
-        d_new(1:i-1)  =d_layers(1:i-1);
-        d_new(i:N_l-1)=d_layers(i+1:N_l);
-        idx_new(1:i-1)  =idx_layers(1:i-1);
-        idx_new(i:N_l-1)=idx_layers(i+1:N_l);
-        
-        idx_layers=idx_new;
-        d_layers  =d_new;
-    }
-}        
+
 
 #savedata('best_design_TM',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);

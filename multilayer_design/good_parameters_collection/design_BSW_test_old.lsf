@@ -10,10 +10,16 @@ n_SiO2=1.46;                                   # low refractive index
 n_pmma=1.48+1i*1e-4;
 n_Ta2O5=2.08+1i*1e-4;                          # high refractive inde
 
+n_in=n_SiO2;
+n_out=1;
+nA=n_SiO2;
+nB=n_Ti2O2;
+nlast=nA;
+ntail=nB;
 
 loaddata('best_param'+'6');#num2str(kkk)
 parameters = best_parameters;
-indeces = best_index;
+parameters;
 tail = parameters(1);
 dlast = parameters(2);
 dAlO = parameters(3);
@@ -22,16 +28,6 @@ dsecondlast_A = parameters(5)*1;
 dA = parameters(6);
 dB = parameters(7);
 
-n_in = indeces(1);        
-n_out = indeces(2);       
-nA = indeces(3);          
-nB = indeces(4);          
-nlast = indeces(5);      
-ntail = indeces(6);       
-
-N = parameters(8);    
-
-# the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
 N=10;
 
 
