@@ -101,6 +101,27 @@ selectfigure(2);
 holdon;
 plot(z,real(nz)*400);
         selectfigure(1);
+        
+N_l=length(d_layers);
+for (i=1;i<N_l;i=i+1){
+    N_l=length(d_layers);
+    if (d_layers(i)==0){
+        d_new=matrix(N_l-1);
+        idx_new=matrix(N_l-1);
+        
+        d_new(1:i-1)  =d_layers(1:i-1);
+        d_new(i:N_l-1)=d_layers(i+1:N_l);
+        idx_new(1:i-1)  =idx_layers(1:i-1);
+        idx_new(i:N_l-1)=idx_layers(i+1:N_l);
+        
+        idx_layers=idx_new;
+        d_layers  =d_new;
+    }
+}
 
+?idx_layers;
+?d_layers;
+        
+        
 
 #savedata('best_design_TM',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);

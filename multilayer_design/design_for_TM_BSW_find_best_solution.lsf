@@ -21,16 +21,17 @@ function toss(value, ranges){
 }
 
 
-n_Ti2O2=2.53+1i*1e-4;
-n_AlO=1.65+1i*1e-4;
-n_SiO2=1.46;
+n_Ti2O2=2.53+1i*1e-4;                          # high refractive index
+n_AlO=1.65+1i*1e-4;                            # low refractive index
+n_SiO2=1.46;                                   # low refractive index
 n_pmma=1.48+1i*1e-4;
-n_Ta2O5=2.08+1i*1e-4;
+n_Ta2O5=2.08+1i*1e-4;                          # high refractive inde
 
 n_in=n_SiO2;
 n_out=1;
-nL=n_AlO;
-nH=n_Ti2O2;
+# might want to swap the two
+nA=n_AlO;
+nB=n_Ti2O2;
 ntail=1;
 
 theta_lim = asin(n_out/n_in)/pi*180+0.5;
@@ -38,35 +39,36 @@ theta = linspace(40,60,1e4);                    # angle vector10
 lambda=570e-9;
 N=8;
 
-kL=2*pi/lambda*real(nL)*cos(40/180*pi);
-kH=2*pi/lambda*real(nH)*cos(40/180*pi);
+kL=2*pi/lambda*real(nA)*cos(40/180*pi);
+kH=2*pi/lambda*real(nB)*cos(40/180*pi);
 FF=0.7;
 period=pi*0.95/(kL*FF+kH*(1-FF));
-dL_0=period*FF;
-dH_0=period*(1-FF);
-tail_0=
-dlastTitania_0=
-dAlO_0=20e-9;
-dsecondlastTitania_0=0.2*dH_0;
-dlastSilica_0=dL_0*0.75;
-d_out=0e-6;
+dA_0=period*FF;
+dB_0=period*(1-FF);
+# tail_0=
+# dlastTitania_0=
+# dAlO_0=20e-9;
+# dsecondlastTitania_0=0.2*dB_0;
+# dlastSilica_0=dA_0*0.75;
+# d_out=0e-6;
 
 best_parameters=matrix(7);
 best_parameters(1) = 0e-9;          # pmma thickness
-best_parameters(2) = dH_0;          # last titania layer thickness
-best_parameters(3) = dL_0;          # AlO layer thicknes (etch stop layer)
-best_parameters(4) = dH_0;          # second last titania layer (a layer below etch stop)
-best_parameters(5) = dL_0;          # last Silica layer
-best_parameters(6) = dL_0;
-best_parameters(7) = dH_0;
+best_parameters(2) = dB_0;          # last titania layer thickness
+best_parameters(3) = dA_0;          # AlO layer thicknes (etch stop layer)
+best_parameters(4) = dB_0;          # second last titania layer (a layer below etch stop)
+best_parameters(5) = dA_0;          # last Silica layer
+best_parameters(6) = dA_0;          # dielectric 1
+best_parameters(7) = dB_0;          # dielectric 2
 
 # N high-low couples + one for substrate, one for air, one for the pmma layer, one for last titania
 # one for allumina protective layer and one for second last titania.
-N_layers=2*N+6;   
-n1 = matrix(N_layers);   # with all layer including pmma
+N_layers=2*N+6;
+
+# n1 = matrix(N_layers);   # with all layer including pmma
 n2 = matrix(N_layers-1); # without pmma
 n3 = matrix(N_layers-2); # without last titania
-d1 = matrix(N_layers);
+# d1 = matrix(N_layers);
 d2 = matrix(N_layers-1);
 d3 = matrix(N_layers-2);
 
@@ -77,8 +79,8 @@ i=1;
 j=0;
 tol=1;
 
-#best_parameters = 1*best_parameters ;
-loaddata('best_param3');
+# best_parameters = 1*best_parameters ;
+# loaddata('best_param3');
 for (0; tol ; 0) {   # while loop
     i=i+1;
     j=j+1;
@@ -115,36 +117,36 @@ for (0; tol ; 0) {   # while loop
     dAlO = parameters(3);
     dsecondlastTitania = parameters(4);
     dlastSilica = parameters(6);
-    dL = parameters(6);
-    dH = parameters(7);
+    dA = parameters(6);
+    dB = parameters(7);
     
     #n1(1) = n_in;
-    #n1(2:2:2*N) = nH;
-    #n1(3:2:2*N+1) = nL;
-    #n1(end-4) = nH;
+    #n1(2:2:2*N) = nB;
+    #n1(3:2:2*N+1) = nA;
+    #n1(end-4) = nB;
     #n1(end-3) = n_AlO;
-    #n1(end-2) = nH;
+    #n1(end-2) = nB;
     #n1(end-1) = ntail;
     #n1(end) = n_out;
     
     n2(1) = n_in;
-    n2(2:2:2*N) = nH;
-    n2(3:2:2*N+1) = nL;
-    n2(end-3) = nH;
+    n2(2:2:2*N) = nB;
+    n2(3:2:2*N+1) = nA;
+    n2(end-3) = nB;
     n2(end-2) = n_AlO;
-    n2(end-1) = nH;
+    n2(end-1) = nB;
     n2(end) = n_out;
     
     n3(1) = n_in;
-    n3(2:2:2*N) = nH;
-    n3(3:2:2*N+1) = nL;
-    n3(end-2) = nH;
+    n3(2:2:2*N) = nB;
+    n3(3:2:2*N+1) = nA;
+    n3(end-2) = nB;
     n3(end-1) = n_AlO;
     n3(end) = n_out;
     
     #d1(1) = 1e-6;
-    #d1(2:2:2*N) = dH;
-    #d1(3:2:2*N+1) = dL;
+    #d1(2:2:2*N) = dB;
+    #d1(3:2:2*N+1) = dA;
     #d1(end-5) = dlastSilica;
     #d1(end-4) = dsecondlastTitania;
     #d1(end-3) = dAlO;
@@ -153,8 +155,8 @@ for (0; tol ; 0) {   # while loop
     #d1(end) = d_out;
     
     d2(1) = 1e-6;
-    d2(2:2:2*N) = dH;
-    d2(3:2:2*N+1) = dL;
+    d2(2:2:2*N) = dB;
+    d2(3:2:2*N+1) = dA;
     d2(end-4) = dlastSilica;
     d2(end-3) = dsecondlastTitania;
     d2(end-2) = dAlO;
@@ -162,8 +164,8 @@ for (0; tol ; 0) {   # while loop
     d2(end) = d_out;
     
     d3(1) = 1e-6;
-    d3(2:2:2*N) = dH;
-    d3(3:2:2*N+1) = dL;
+    d3(2:2:2*N) = dB;
+    d3(3:2:2*N+1) = dA;
     d3(end-3) = dlastSilica;
     d3(end-2) = dsecondlastTitania;
     d3(end-1) = dAlO;
