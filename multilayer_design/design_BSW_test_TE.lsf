@@ -12,11 +12,11 @@ n_Ta2O5=2.08+1i*1e-4;
 
 n_in=n_SiO2;
 n_out=1;
-nL=n_AlO;
-nH=n_Ti2O2;
-ntail=1;
+nL=n_SiO2+1i*1e-4;
+nH=n_Ta2O5;
+ntail=n_pmma;
 
-loaddata('best_param'+'TM');#num2str(kkk)
+loaddata('best_param'+'TE');#num2str(kkk)
 parameters = best_parameters;
 ?parameters;
 tail = parameters(1);
@@ -27,7 +27,7 @@ dlastSilica = parameters(5);
 dL = parameters(6);
 dH = parameters(7);
 
-N=11;
+N=7;
 
 
 
@@ -64,9 +64,9 @@ for (i=[1:3]){
     
     #image(RT1.theta,RT1.lambda*1e6,transpose(RT1.Rp),"theta (deg)","wavelength (um)","Rp, dispersive example");    
     
-    idx=findpeaks(1-RT1.Rp);
+    idx=findpeaks(1-RT1.Rs);
     field = stackfield(n1,d,c/lambda,theta(idx),1e4,0,7e-6);
-    H=abs(pinch(sqrt(field.Hp(1,1,:,1,1,1)^2+field.Hp(1,1,:,1,1,2)^2+field.Hp(1,1,:,1,1,3)^2)))^2;#
+    H=abs(pinch(sqrt(field.Es(1,1,:,1,1,1)^2+field.Es(1,1,:,1,1,2)^2+field.Es(1,1,:,1,1,3)^2)))^2;#
     z=field.z;
     
     if (i==1) { 
@@ -81,7 +81,7 @@ for (i=[1:3]){
                 }
             }
         }
-        plot(theta,RT1.Rp,RT1.Tp); 
+        plot(theta,RT1.Rs,RT1.Ts); 
         selectfigure(2);
         plot(z,H);
     } else {
@@ -89,7 +89,7 @@ for (i=[1:3]){
         else {    n_eff3 = sin(theta(idx)*pi/180)*n_in; 
         selectfigure(1);
         holdon;
-        plot(theta,RT1.Rp); 
+        plot(theta,RT1.Rs,RT1.Ts); 
         selectfigure(2);
         holdon;
         plot(z,H);
