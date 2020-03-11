@@ -4,6 +4,8 @@
 *.log
 *.bak
 *.asv
+*~
+\#*\#
 
 # avoid data files
 *.mat

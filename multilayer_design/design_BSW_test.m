@@ -21,7 +21,7 @@ dlastSilica = 127e-9;
 dL = 137e-9;
 dH = 95e-9;
 
-N=8;
+N=7;
 % N high-low couples + one for substrate, one for air, one for the 
 % pmma layer, one for last titania one for allumina protective layer 
 %and one for second last titania.

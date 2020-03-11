@@ -13,21 +13,22 @@ while n(i-1)==n(end)
     d(i-1)=0;
     i=i-1;
 end
-% d(1)=0;
+d(1)=0;
 d(end)=0;
 size_T=length(theta_in);
 r=zeros(1,size_T);
 t=zeros(1,size_T);
 
+beta = n(1)*sin(theta_in);
 %% loop
 for i=1:size_T
-    theta_z=asin(n(1)./n.*sin(theta_in(i)));
+    costheta_z = sqrt(n.^2-beta(i)^2)./n;  
 %     D=eye(2);
     T=eye(2);
     for j=1:N_layers-1
-        P = prop(K*n(j),d(j),theta_z(j));
-%         D=D*P*Dij(n(j),n(j+1),theta_z(j),theta_z(j+1),pol);
-        Tijc=Tij(n(j),n(j+1),theta_z(j),theta_z(j+1),pol);
+        P = prop(K*n(j),d(j),costheta_z(j));
+%         D=D*P*Dij(n(j),n(j+1),beta(i),pol);
+        Tijc=Tij(n(j),n(j+1),beta(i),pol);
         T=Tijc*P*T;
     end
 %     t(i) = 1/D(1,1);
