@@ -1,6 +1,22 @@
-*.mat
+# avoid lumerical (and some matlab) files
 *.fsp
 *.lms
 *.log
 *.bak
+*.asv
+
+# avoid data files
+*.mat
+*.csv
+
+# avoid videos and images
 *.mpg
+*.avi
+*.mp4
+*.png
+*.fig
+*.jpg
+*.JPEG
+
+#avoid personal notes
+*.txt
