@@ -84,7 +84,7 @@ for (i=[1:3]){
                 }
             }
         }
-        plot(theta,RT1.Rp); 
+        plot(theta,RT1.Rp,RT1.Tp); 
         selectfigure(2);
         plot(z,H);
     } else {
