@@ -30,7 +30,7 @@ nB = indeces(4);
 nlast = indeces(5);      
 ntail = indeces(6);       
 
-N = parameters(8)+1;    
+N = parameters(8)+6;    
 
 # the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
 
@@ -122,4 +122,4 @@ for (i=1;i<N_l;i=i+1){
     }
 }        
 
-savedata('best_design_TM3',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
+savedata('best_design_TM4',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
