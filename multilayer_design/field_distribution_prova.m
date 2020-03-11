@@ -1,7 +1,7 @@
 function [P, z, nz] = field_distribution(lambda,theta,d,n,r,t,pol)
 
 if length(theta) ~= 1 || length(r) ~= 1 || length(lambda) ~= 1
-    error('Inputs should be scalars')
+    error('Wavelegth, angle of incidence and thus reflectivity value should be scalars')
 end
 
 K=2*pi/lambda;
@@ -9,15 +9,15 @@ K=2*pi/lambda;
 dair=d(end);
 d(end)=0;
 
-sz=1e4;
+sz=5e3;
 z=linspace(0,sum(d),sz);
-nz = n(1)*ones(1,sz);
+nz = ones(1,sz);
 for i=1:sz
     for j=1:length(d)
         
         % the following is useful to include inside the z vector the 
         % point corresponding to the interfaces
-%         if abs(z(i)-sum(d(1:j))) <= (z(2)-z(1))/2
+%         if abs(z(i)-sum(d(1:j))) <= z(2)-z(1)/2
 %             z(i)=sum(d(1:j));
 %         end
         if (z(i)<=sum(d(1:j))&&(z(i)>sum(d(1:j-1))))
@@ -51,48 +51,39 @@ Et=zeros(2,sz);
 Et(1,1)=1;
 Et(2,1)=r;
 Mt = eye(2);
-% Mt = zeros(2,2,sz);
-% Mt(:,:,1) = eye(2);
-
 Et_air=zeros(2,sz_air);
 
 Ed=zeros(2,sz);
 Ed(1,end)=t;
 Ed(2,end)=0;
-Md = eye(2);    
-
+Md = eye(2);
 Ed_air=zeros(2,sz_air);
 
-j=0;
+for i=1:sz-1
+    if nz(sz-i)~=nz(sz-i+1)
+        D = Dij(nz(sz-i),nz(sz-i+1),theta_z(sz-i),theta_z(sz-i+1),pol);
+        Md= D*Md;
+    end
+    kd=K*nz(sz-i+1);
+    Pd = prop(kd,z(sz-i)-z(sz-i+1),theta_z(sz-i+1)) ;
+    Md = Pd*Md;
+    
+    Ed(:,sz-i) = Md*Ed(:,end);
+end
+
 for i=1:sz-1
     kt=K*nz(i);
     Pt = prop(kt,z(i+1)-z(i),theta_z(i));
-    Mt = Pt*Mt;
-    j=j+1;
-    if nz(i) ~= nz(i+1)
+    Mt  = Pt*Mt;
+    
+    if nz(i)~=nz(i+1)
         j = 0;
         T = Tij(nz(i),nz(i+1),theta_z(i),theta_z(i+1),pol);
         Mt = T*Mt;
     end
     
-    Et(:,i+1)  = Mt*[1;r];
+    Et(:,i+1)  = Mt*Et(:,1);
 end  
-Mt(:,:,end)*[1;r]
-
-j=0;
-for i=1:sz-1
-    if nz(sz-i)~=nz(sz-i+1)
-        j=0;
-        D = Dij(nz(sz-i),nz(sz-i+1),theta_z(sz-i),theta_z(sz-i+1),pol);
-        Md= D*Md;
-    end
-    kd=K*nz(sz-i);
-    Pd = prop(kd,z(sz-i)-z(sz-i+1),theta_z(sz-i)) ;
-    Md = Pd*Md;
-    
-    Ed(:,sz-i) = Md*[t;0];
-end
-
 z  = [z, z_air+sum(d)];
 nz = [nz, nz_air];
 

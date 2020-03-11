@@ -21,8 +21,9 @@ dL = 137e-9;
 dH = 95e-9;
 
 N=7;
-% N high-low couples + one for substrate, one for air, one for the pmma layer, one for last titania
-% one for allumina protective layer and one for second last titania.
+% N high-low couples + one for substrate, one for air, one for the 
+% pmma layer, one for last titania one for allumina protective layer 
+%and one for second last titania.
 N_layers=2*N+3;    
 
 n1 = zeros(N_layers,1);
@@ -42,19 +43,23 @@ n1(3:2:2*N+1) = nL;
 n1(end-1) = ntail;
 n1(end) = n_out;
 
-[R,r,t,A] = reflectivity(lambda,theta_v,d,n1,'s');
-figure
-plot(theta_v,abs(r).^2,theta_v,abs(t).^2);
-ylim([0 1])
-nicePlot;
+[R,r,t A] = reflectivity(lambda,theta_v,d,n1,'s');
+% figure
+% plot(theta_v,abs(r).^2,theta_v,abs(t).^2);
+% ylim([0 1])
+% nicePlot;
 %%
-[pks,idxs]=findpeaks(1-R);
+
+[pks,idxs] = findpeaks(1-R);
 [~,pk_ix] = max(pks);
 idx = idxs(pk_ix);
 
-[P, z, nz] = field_distribution(lambda,theta_v(idx),d,n1,r(idx),t(idx),'s');
+A(:,:,idx)*[1;r(idx)]
 
-figure
-plot(z,P,z,real(nz)*max(P)/3)
-nicePlot
-% ylim([0 10])
+[P, z, nz] = field_distribution(lambda,theta_v(idx),d,n1,...
+                                                   r(idx),t(idx),'s');
+
+% figure
+% plot(z,P,z,real(nz)*400)
+% nicePlot
+% % ylim([0 10])
