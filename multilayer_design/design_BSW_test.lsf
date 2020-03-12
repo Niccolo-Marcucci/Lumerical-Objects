@@ -16,8 +16,8 @@ loaddata('best_param'+'3');#num2str(kkk)
 parameters = best_parameters;
 indeces = best_index;
 tail = parameters(1);
-dlast = 60e-9;# parameters(2)*0.85;
-dAlO = parameters(3);
+dlast = 60e-9-10e-9;# parameters(2)*0.85;
+dAlO = 25e-9;parameters(3);
 dsecondlast_B = 57e-9;#parameters(4)*scale_period;
 dsecondlast_A = 133e-9;#parameters(5)*scale_period;
 dA = 133e-9;#parameters(6)*scale_period;
@@ -108,7 +108,7 @@ selectfigure(1);
 legend('With last layer', 'Without last layer');
         
 N_l=length(d_layers);
-for (i=1;i<N_l;i=i+1){
+for (i=2;i<N_l;i=i+1){
     N_l=length(d_layers);
     if (d_layers(i)==0){
         d_new=matrix(N_l-1);
@@ -121,7 +121,8 @@ for (i=1;i<N_l;i=i+1){
         
         idx_layers=idx_new;
         d_layers  =d_new;
-    }
+        i=1;
+    } 
 }        
 
-savedata('best_design_TM5',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
+savedata('designs/best_design_TM5',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
