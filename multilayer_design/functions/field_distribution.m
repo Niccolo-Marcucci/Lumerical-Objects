@@ -27,6 +27,9 @@ zv =[0; cumsum(d)];
 
 for i=1:sz
     for j=length(d):-1:1
+        if abs(z(i)-zv(j+1)) <= (z(2)-z(1))/2
+            z(i)=zv(j+1);
+        end
         if (z(i) < zv(j+1)) && (z(i) >= zv(j))
             nz(i)=n(j);
         end
