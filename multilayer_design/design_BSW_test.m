@@ -14,7 +14,7 @@ n_in=n_SiO2;
 n_out=1;
 nL=n_SiO2+1i*1e-4;
 nH=n_Ta2O5;
-ntail=n_pmma;
+ntail= n_pmma;
 
 tail = 0;75e-9;
 dlastSilica = 127e-9;
