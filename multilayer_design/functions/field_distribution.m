@@ -6,13 +6,13 @@ end
 
 K=2*pi/lambda;
 
-i=length(d);
-while n(i-1)==n(end)
-    d(i-1)=0;
-    i=i-1;
-end
-dsub = d(1);
-d(1) = 0;
+% i=length(d);
+% while n(i-1)==n(end)
+%     d(i-1)=0;
+%     i=i-1;
+% end
+% dsub = d(1);
+% d(1) = 0;
 dair = d(end);
 d(end)=0;
 
@@ -24,25 +24,25 @@ z  = linspace(0,sum(d),sz);
 nz = ones(1,sz);
 
 zv =[0; cumsum(d)];
-
+step = z(2)-z(1);
 for i=1:sz
-    for j=length(d):-1:1
-        if abs(z(i)-zv(j+1)) <= (z(2)-z(1))/2
-            z(i)=zv(j+1);
+    for j=length(zv):-1:2
+        if abs(z(i)-zv(j)) <= step/2
+            z(i)=zv(j);
+            nz(i)=n(j-1);
+        elseif (z(i) < zv(j)) && (z(i) >= zv(j-1))
+            nz(i)=n(j-1);
         end
-        if (z(i) < zv(j+1)) && (z(i) >= zv(j))
-            nz(i)=n(j);
-        end
-    end
+     end
 end
 
-nz(1)=n(1);
-nz(end)=n(end);
-step = z(2)-z(1);
+% nz(1)=n(1);
+% nz(end)=n(end);
+% step = z(2)-z(1);
 
-z_sub = -dsub : step : -step;
-sz_sub = length(z_sub);
-nz_sub = n(1)*ones(1,sz_sub);
+% z_sub = -dsub : step : -step;
+% sz_sub = length(z_sub);
+% nz_sub = n(1)*ones(1,sz_sub);
 
 z_air = step : step : dair;
 sz_air = length(z_air);
@@ -59,7 +59,7 @@ costheta_z = sqrt(nz.^2-beta^2)./nz;
 %   field on the left (assuming input field comes from the left
 %   All vectors and matrices that refer to this metod have suffix t
 % - the second one is the TMM applied from right to left, where
-%   Ein = D * Ein
+%   Ein = D * Eout
 %   All vectors and matrices that refer to this method have suffix d
 %
 % They are absolutely equivalent, but the matrices T and D use
@@ -75,7 +75,7 @@ Et(2,1)=r;
 Mt = eye(2);
 
 Et_air=zeros(2,sz_air);
-Et_sub=zeros(2,sz_sub);
+% Et_sub=zeros(2,sz_sub);
 
 Ed=zeros(2,sz);
 Ed(1,end)=t;
@@ -83,7 +83,7 @@ Ed(2,end)=0;
 Md = eye(2);    
 
 Ed_air=zeros(2,sz_air);
-Ed_sub=zeros(2,sz_sub);
+% Ed_sub=zeros(2,sz_sub);
 
 for i=1:sz-1
     kt=K*nz(i);
@@ -109,27 +109,27 @@ for i=sz:-1:2
     Ed(:,i-1) = Md*[t;0];
 end
 
-z  = [z_sub,   z, z_air+z(end)];
-nz = [nz_sub, nz, nz_air];
-% z  = [ z, z_air+z(end)];
-% nz = [nz, nz_air];
+% z  = [z_sub,   z, z_air+z(end)];
+% nz = [nz_sub, nz, nz_air];
+z  = [ z, z_air+z(end)];
+nz = [nz, nz_air];
 
 Et_air(1,:) = Et(1,end)*exp(+1i*K*nz(end)*costheta_z(end)*z_air);
-Et_sub(1,:) = Et(1,1)*exp(+1i*K*nz(1)*costheta_z(1)*z_sub);
-Et_sub(2,:) = Et(2,1)*exp(-1i*K*nz(1)*costheta_z(1)*z_sub);
-Et=[Et_sub, Et, Et_air];
-% Et=[Et, Et_air];
+% Et_sub(1,:) = Et(1,1)*exp(+1i*K*nz(1)*costheta_z(1)*z_sub);
+% Et_sub(2,:) = Et(2,1)*exp(-1i*K*nz(1)*costheta_z(1)*z_sub);
+% Et=[Et_sub, Et, Et_air];
+Et=[Et, Et_air];
 
 Ed_air(1,:) = Ed(1,end)*exp(+1i*K*nz(end)*costheta_z(end)*z_air);
-Ed_sub(1,:) = Ed(1,1)*exp(+1i*K*nz(1)*costheta_z(1)*z_sub);
-Ed_sub(2,:) = Ed(2,1)*exp(-1i*K*nz(1)*costheta_z(1)*z_sub);
-Ed=[Ed_sub, Ed, Ed_air];
-% Ed=[Ed, Ed_air];
+% Ed_sub(1,:) = Ed(1,1)*exp(+1i*K*nz(1)*costheta_z(1)*z_sub);
+% Ed_sub(2,:) = Ed(2,1)*exp(-1i*K*nz(1)*costheta_z(1)*z_sub);
+% Ed=[Ed_sub, Ed, Ed_air];
+Ed=[Ed, Ed_air];
 
 if pol == 'p'
     H_correction=nz/physconst('lightspeed');
 else
-    H_correction=ones(1,sz+sz_air+sz_sub);
+    H_correction=ones(1,sz+sz_air);%+sz_sub);
 end
 
 figure
