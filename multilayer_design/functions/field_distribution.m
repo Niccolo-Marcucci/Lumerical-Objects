@@ -1,4 +1,4 @@
-function [P, z, nz] = field_distribution(lambda,theta,d,n,r,t,pol)
+function [z, nz, P, field] = field_distribution(lambda,theta,d,n,r,t,pol)
 
 if length(theta) ~= 1 || length(r) ~= 1 || length(lambda) ~= 1
     error('Inputs should be scalars')
@@ -113,19 +113,27 @@ Et=[Et_sub, Et, Et_air];
 % Ed_sub(2,:) = Ed(2,1)*exp(-1i*K*nz(1)*costheta_z(1)*z_sub);
 % Ed=[Ed_sub, Ed, Ed_air];
 
-if pol == 'p'
-    H_correction=nz/physconst('lightspeed');
-else
-    H_correction=ones(1,sz+sz_air+sz_sub);
-end
-
-Ht = Et*H_correction;
 
 % figure
 % plot(z,abs(Ed(1,:)+Ed(2,:)).^2,z,abs(Et(1,:)+Et(2,:)).^2,...
 %      z,real(nz)*400);
 % nicePlot
 % ylim([0 1400])
-P = abs((Et(1,:)+Et(2,:)).*H_correction).^2;
+if nargout > 3
+    H_correction=nz/physconst('lightspeed');
+
+    field.Er = Et(1,:);
+    field.El = Et(2,:);
+
+    field.Hr = Et(1,:)*H_correction;
+    field.Hl = Et(2,:)*H_correction;
+end
+
+if pol == 'p'
+    H_correction=nz/physconst('lightspeed');
+    P = abs((Et(1,:)+Et(2,:)).*H_correction).^2;
+else
+    P = abs(Et(1,:)+Et(2,:)).^2;
+end
 
 end
