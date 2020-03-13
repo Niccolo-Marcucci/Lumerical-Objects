@@ -76,10 +76,11 @@ X12 = ones(3,1);
 Partition = 0;
 i=1;
 rng(now);
+rng(06061995);
 tol=1;
 % Pm=zeros(11,400);
 
-for j = 1:3
+for j = 1: 30
     
     % randomize the parameter. One at a time. 
     i=i+1;

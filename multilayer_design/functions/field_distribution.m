@@ -5,7 +5,7 @@ if length(theta) ~= 1 || length(r) ~= 1 || length(lambda) ~= 1
 end
 
 K=2*pi/lambda;
-
+c0 = 299792458;
 [d,n,dsub,dair] = prepare_multilayer(d,n);
 
 % determining an optimal resolution, 20 points on the thinnest layer
@@ -119,8 +119,9 @@ Et=[Et_sub, Et, Et_air];
 %      z,real(nz)*400);
 % nicePlot
 % ylim([0 1400])
+
 if nargout > 3
-    H_correction=nz/physconst('lightspeed');
+    H_correction=nz/c0;
 
     field.Er = Et(1,:);
     field.El = Et(2,:);
@@ -130,8 +131,7 @@ if nargout > 3
 end
 
 if pol == 'p'
-    H_correction=nz/physconst('lightspeed');
-    P = abs((Et(1,:)+Et(2,:)).*H_correction).^2;
+    P = abs((Et(1,:)+Et(2,:)).*nz).^2;
 else
     P = abs(Et(1,:)+Et(2,:)).^2;
 end

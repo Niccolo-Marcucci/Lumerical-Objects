@@ -1,6 +1,6 @@
 % 
 % 
-function T = Tij(n_i,n_j,beta,pol)
+function [T11,T12,T21,T22] = Tij(n_i,n_j,beta,pol)
     costheta_i = sqrt(n_i.^2-beta^2)./n_i;  
     costheta_j = sqrt(n_j.^2-beta^2)./n_j;  
     if pol == 's'
@@ -17,7 +17,11 @@ function T = Tij(n_i,n_j,beta,pol)
         error("Invalid Polarization. Valid options are 's' or 'p'")
     end
 
-    T = 1/tji* [ 1 , rji ;
-                rji,  1  ];  
+    T11 = 1/tji;
+    T12 = rji/tji;
+    T21 = rji/tji;
+    T22 = 1;
+%     T = 1/tji* [ 1 , rji ;
+%                 rji,  1  ];  
     
 end
