@@ -1,14 +1,16 @@
 % 
 % 
-function T = Tij(n_i,n_j,theta_i,theta_j,pol)
+function T = Tij(n_i,n_j,beta,pol)
+    costheta_i = sqrt(n_i.^2-beta^2)./n_i;  
+    costheta_j = sqrt(n_j.^2-beta^2)./n_j;  
     if pol == 's'
-        rij = (n_i*cos(theta_i)-n_j*cos(theta_j))./...
-              (n_i*cos(theta_i)+n_j*cos(theta_j));
+        rij = (n_i*costheta_i-n_j*costheta_j)./...
+              (n_i*costheta_i+n_j*costheta_j);
         rji = -rij;
         tji =  rji + 1;
     elseif pol == 'p'
-        rij = (n_j*cos(theta_i)-n_i*cos(theta_j))./...
-              (n_j*cos(theta_i)+n_i*cos(theta_j));
+        rij = (n_j*costheta_i-n_i*costheta_j)./...
+              (n_j*costheta_i+n_i*costheta_j);
         rji = -rij;
         tji = (rji + 1)*n_j/n_i;
     else 

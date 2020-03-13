@@ -14,14 +14,14 @@ n_in=n_SiO2;
 n_out=1;
 nL=n_SiO2+1i*1e-4;
 nH=n_Ta2O5;
-ntail=n_pmma;
+ntail= n_pmma;
 
 tail = 0;75e-9;
 dlastSilica = 127e-9;
 dL = 137e-9;
 dH = 95e-9;
 
-N=8;
+N=7;
 % N high-low couples + one for substrate, one for air, one for the 
 % pmma layer, one for last titania one for allumina protective layer 
 %and one for second last titania.
@@ -59,7 +59,7 @@ idx = idxs(pk_ix);
 [P, z, nz] = field_distribution(lambda,theta_v(idx),d,n1,...
                                                    r(idx),t(idx),'s');
 
-% figure
-% plot(z,P,z,real(nz)*400)
-% nicePlot
-% % ylim([0 10])
+figure
+plot(z,P,z,real(nz)*400)
+nicePlot
+% ylim ([0 10])
