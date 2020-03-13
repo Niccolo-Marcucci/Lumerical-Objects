@@ -59,7 +59,7 @@ idx = idxs(pk_ix);
 [P, z, nz] = field_distribution(lambda,theta_v(idx),d,n1,...
                                                    r(idx),t(idx),'s');
 
-% figure
-% plot(z,P,z,real(nz)*400)
-% nicePlot
-% % ylim([0 10])
+figure
+plot(z,P,z,real(nz)*400)
+nicePlot
+% ylim ([0 10])

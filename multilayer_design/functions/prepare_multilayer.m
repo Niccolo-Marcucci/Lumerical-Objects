@@ -18,7 +18,6 @@ function [d,n,d1,d2] = prepare_multilayer(d,n)
         d(i)=0;                     % layer with n~=n(1), that has
         i=i+1;                        % definite thickness
     end	
-
     i = N_l-1;
     while (n(i)==n(end)) || (d(i)==0) 
         d(i)=0;

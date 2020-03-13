@@ -119,6 +119,8 @@ else
     H_correction=ones(1,sz+sz_air+sz_sub);
 end
 
+Ht = Et*H_correction;
+
 % figure
 % plot(z,abs(Ed(1,:)+Ed(2,:)).^2,z,abs(Et(1,:)+Et(2,:)).^2,...
 %      z,real(nz)*400);
