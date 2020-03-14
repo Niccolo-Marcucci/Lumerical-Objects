@@ -66,7 +66,7 @@ for (i=[1:3]){
     
     idx=findpeaks(1-RT1.Rs);
     field = stackfield(n1,d,c/lambda,theta(idx),1e4,0,7e-6);
-    H=abs(pinch(sqrt(field.Es(1,1,:,1,1,1)^2+field.Es(1,1,:,1,1,2)^2+field.Es(1,1,:,1,1,3)^2)))^2;#
+    H=pinch(abs(field.Es(1,1,:,1,1,1))^2+abs(field.Es(1,1,:,1,1,2))^2+abs(field.Es(1,1,:,1,1,3))^2);#
     z=field.z;
     
     if (i==1) { 
@@ -84,6 +84,7 @@ for (i=[1:3]){
         plot(theta,RT1.Rs); 
         selectfigure(2);
         plot(z,H);
+        H1=H;
     } else {
         if(i==2){ n_eff2 = sin(theta(idx)*pi/180)*n_in; }
         else {    n_eff3 = sin(theta(idx)*pi/180)*n_in; 
@@ -93,6 +94,7 @@ for (i=[1:3]){
         selectfigure(2);
         holdon;
         plot(z,H);
+        H2=H;
         }
     }    
 }
@@ -107,3 +109,4 @@ legend('With last layer', 'Without last layer');
 
 #savedata('best_design_TM',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
 matlabsave('best_design_TE',idx_layers,d_layers);
+matlabsave('field_TE',z,H1,H2);

@@ -1,5 +1,5 @@
-% 
-% 
+% TMM where E_out = T * E_in
+% r = -T21/T22, t = T11 + T12*r
 function T = Tij(n_i,n_j,beta,pol)
     costheta_i = sqrt(n_i.^2-beta^2)./n_i;  
     costheta_j = sqrt(n_j.^2-beta^2)./n_j;  

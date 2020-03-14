@@ -2,7 +2,6 @@ close all;
 clear;
 addpath('functions');
 
-
 n_Ti2O2 = 2.53+1i*1e-4;           	% high refractive index
 n_AlO   = 1.65+1i*1e-4;             % low refractive index
 n_SiO2  = 1.46+1i*1e-4;             % low refractive index
@@ -80,11 +79,9 @@ for k = 2:3
     n = [n1(1:end-k) ; n1(end)];
     d = [d1(1:end-k) ; d1(end)];
     
+    [dr,nr,~,~] = prepare_multilayer(d,n);
     
-    
-    RT1 = reflectivity(lambda,theta,d,n,pol);
-
-    [R,r,t] = reflectivity(lambda,theta,d,n,pol);
+    [R,r,t] = reflectivity(lambda,theta,dr,nr,pol);
     [pks,idxs] = findpeaks(1-R);
     [~,pk_ix] = max(pks);
     idx = idxs(pk_ix);
@@ -93,29 +90,28 @@ for k = 2:3
     figure(1)
     hold on
     plot(theta,R)
-    R(idx)
-    t(idx)
-    [z, ~, P ] = field_distribution(lambda,theta(idx),d,n,...
+%     R(idx)
+%     t(idx)
+    [z1, ~, P ] = field_distribution(lambda,theta(idx),d,n,...
                                                 r(idx),t(idx),pol);
     figure(2)
     hold on
-    plot(z,2*P)
+    plot(z1,2*P)
         
 end  
 n_eff(1)=n_eff(2);
 
-n_eff(1)/n_eff(3);
+n_eff(1)/n_eff(3)
 
 [d1,n1] = prepare_multilayer(d1,n1);
 
-[z, nz] = field_distribution(lambda,theta(idx),d1,n1);
+[z1, nz] = field_distribution(lambda,theta(idx),d1,n1);
 figure(2);
-plot(z,real(nz)*400);
+plot(z1,real(nz)*400);
 legend('Field with last layer', 'Field without last layer', 'Refreactive index x 400');
 nicePlot
 figure(1);
 legend('With last layer', 'Without last layer');
 nicePlot
-
 
 % savedata('designs/best_design_TM5',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
