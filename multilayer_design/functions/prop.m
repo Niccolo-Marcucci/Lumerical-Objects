@@ -1,7 +1,7 @@
 % 
 % 
-function [Pr,Pl] = prop(k,d,costheta)
+function P = prop(k,d,costheta)
     kz=k*costheta; 
-    Pr = exp(+1i*kz*d);  
-    Pl = exp(-1i*kz*d);
+    P = [exp(+1i*kz*d), 0   ;  
+          0 , exp(-1i*kz*d) ];
 end

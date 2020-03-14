@@ -12,10 +12,6 @@
 function [R,r,t,Tr] = reflectivity (lambda,theta_in,d,n,pol)
 
 N_out = nargout;
-N_layers=length(d);
-if N_layers~=length(n) 
-   error("thicknesses and refractive index vectors must have same length")
-end
 
 % if you propose a multilayer which is altready optimized for this
 % calculation (i.e. no dummy layers and no zero thicknes layers), you
@@ -35,20 +31,20 @@ Tr= zeros(1,size_T);
 
 beta = n(1)*sin(theta_in);
 %% loop
-parfor i=1:size_T
+for i=1:size_T
     costheta_z = sqrt(n.^2-beta(i)^2)./n;
     T11=1;
-    T12=1;
-    T21=1;
+    T12=0;
+    T21=0;
     T22=1;
 %     T = eye(2);  
 %     D = eye(2);
     for k=1:N_layers-1
 %         [Pr,Pl] = prop(K*n(j),d(j),costheta_z(j));
-        n_i=n(k);
-        n_j=n(k+1);
-        costheta_i=costheta_z(k);
-        costheta_j=costheta_z(k+1);
+        n_i = n(k);
+        n_j = n(k+1);
+        costheta_i = costheta_z(k);
+        costheta_j = costheta_z(k+1);
         kz = K*n_i*costheta_i; 
         Pr = exp(+1i*kz*d(k));  
         Pl = exp(-1i*kz*d(k));
@@ -73,11 +69,17 @@ parfor i=1:size_T
         T12c = rji/tji;
 %         T21c = T12c;
 %         T22c = T11c;
+%         T = 1/tji* [ 1 , rji ;
+%                    rji,  1  ];  
+        T11t = Pr/tji*T11 + T12c*Pl*T21;
+        T12t = Pr/tji*T12 + T12c*Pl*T22;
+        T21t = T12c*Pr*T11 + Pl/tji*T21;
+        T22t = T12c*Pr*T12 + Pl/tji*T22;
+        T11 = T11t;
+        T12 = T12t;
+        T21 = T21t;
+        T22 = T22t;
         
-        T11=Pr*(T11/tji+T12c*T21);
-        T12=Pr*(T12/tji+T12c*T22);
-        T21=Pl*(T12c*T11+T21/tji);
-        T22=Pl*(T12c*T12+T22/tji);
         
 %         T=Tijc*P*T;
 %         P = prop(K*n(j),-d(j),costheta_z(j));
@@ -96,28 +98,3 @@ end
 
 R=abs(r).^2;
 end
-
-% function [T11,T12,T21,T22] = Tijx(n_i,n_j,costheta_i,costheta_j,pol)
-% 
-%     if pol == 's'
-%         rij = (n_i*costheta_i-n_j*costheta_j)./...
-%               (n_i*costheta_i+n_j*costheta_j);
-%         rji = -rij;
-%         tji =  rji + 1;
-%     elseif pol == 'p'
-%         rij = (n_j*costheta_i-n_i*costheta_j)./...
-%               (n_j*costheta_i+n_i*costheta_j);
-%         rji = -rij;
-%         tji = (rji + 1)*n_j/n_i;
-%     else 
-%         error("Invalid Polarization. Valid options are 's' or 'p'")
-%     end
-% 
-%     T11 = 1/tji;
-%     T12 = rji/tji;
-%     T21 = T12;
-%     T22 = T11;
-% %     T = 1/tji* [ 1 , rji ;
-% %                 rji,  1  ];  
-%     
-% end

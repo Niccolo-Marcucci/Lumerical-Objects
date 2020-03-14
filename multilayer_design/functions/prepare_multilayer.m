@@ -44,5 +44,8 @@ function [d,n,d1,d2] = prepare_multilayer(d,n)
             i = i+1;
         end
     end    
-    
+    if nargout < 3
+            d(1) = d1;
+            d(end) = d2;
+    end        
 end
