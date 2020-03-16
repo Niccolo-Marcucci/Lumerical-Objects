@@ -12,13 +12,13 @@ theta = linspace(40,56,1e4);                    % angle vector
 lambda=570e-9;
 
 % the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
-load('best_param4');%num2str(kkk)
-% N=8;  
+load('best_param1');%num2str(kkk)
+% N=10;  
 % best_thicknesses;
 % best_indeces;
 
-pol = 'p';
-scale_period = 1;
+pol = 'p';  
+scale_period = 1.0;
 
 tail = best_thicknesses(1);
 dlast = best_thicknesses(2);
@@ -30,24 +30,12 @@ dA = best_thicknesses(7)*scale_period;
 
 n_in = best_indeces(1);        
 n_out = best_indeces(2);       
-nB = n_AlO;best_indeces(3);          
+nB = best_indeces(3);          
 nA = best_indeces(4);          
 nlast = best_indeces(5);      
 ntail = best_indeces(6);       
 netch = best_indeces(7);    
 
-N=14;
-n_Ti2O2 = 2.53+1i*1e-4;           	% high refractive index
-n_AlO   = 1.65+1i*1e-4;             % low refractive index
-n_SiO2  = 1.46+1i*1e-4;             % low refractive index
-n_pmma  = 1.48+1i*1e-4;
-n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
-dlast = 60e-9;% parameters(2)*0.85;
-detch = 15e-9;%parameters(3);
-dsecondlast_B = 133e-9;%parameters(4)*scale_period;
-dsecondlast_A = 57e-9;%parameters(5)*scale_period;
-dA = 57e-9;%parameters(6)*scale_period;
-dB = 133e-9;
 % the stack is fixed to be S-(A-B)xN-A-etch-last-tail-air
 N_layers=2*N+6;    
 
@@ -114,4 +102,9 @@ figure(1);
 legend('With last layer', 'Without last layer');
 nicePlot
 
-% savedata('designs/best_design_TM5',idx_layers,d_layers,n_eff1,n_eff2,n_eff3);
+idx_layers=n1;
+d_layers=d1
+n_eff1=n_eff(1);
+n_eff2=n_eff(2);
+n_eff3=n_eff(3);
+save designs/best_design_TM_bad idx_layers d_layers n_eff1 n_eff2 n_eff3

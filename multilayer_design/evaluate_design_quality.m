@@ -2,15 +2,15 @@ clear
 close all
 addpath('functions');
 
-load best_design_TE.mat
-load field_TE
+% load designs/design_TM_Descrovi.mat   
+pol='p';
 
 d1=d_layers;
 n1=idx_layers;
+d1(end)=5e-6;
 
 lambda=570e-9;
-theta = linspace(40,56,1e4);     
-pol='s';
+theta = linspace(40,56,1e4);  
 
 for k = 1:2
     n = [n1(1:end-k) ; n1(end)];
@@ -28,7 +28,7 @@ for k = 1:2
 %     R(idx)
 %      t(idx)
     [z1, ~, P ] = field_distribution(lambda,theta(idx),d,n,...
-    r(idx),t(idx),pol);
+                                                r(idx),t(idx),pol);
     figure(2)
     hold on
     plot(z1,2*P)
@@ -40,10 +40,22 @@ end
 [z1, nz] = field_distribution(lambda,theta(idx),d1,n1);
 figure(2);
 plot(z1,real(nz)*400);
-legend('Field with last layer', 'Field without last layer', 'Refreactive index x 400');
+xlabel('z [m]')
+ylabel('Power density')
+legend('Field with last layer', 'Field without last layer',...
+                                        'Refreactive index x 400');
+nicePlot
+
 figure(1);
+ylim([0.2,1])
+xlabel('Incidence angle [degrees]')
+ylabel('Reflectivity')
 legend('With last layer', 'Without last layer');
 nicePlot
-figure(2)
-plot(z-1e-6,H1,z-1e-6,H2)
-nicePlot
+
+
+folder="~/OneDrive/BSW/Pictures/";
+name=strcat(folder,"TM_Descrovi_Field_distribution");
+% saveas(figure(2),name,'png')
+name=strcat(folder,"TM_Descrovi_BWS_lines");
+% saveas(figure(1),name,'png')

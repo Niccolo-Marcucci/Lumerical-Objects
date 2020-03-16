@@ -1,0 +1,12 @@
+file="best_design";
+#"best_design_TM3.ldf"
+#"best_design_TM5.ldf"
+#"best_design_TE.ldf"
+#"best_design_TM2.ldf"
+#"best_design_TM4.ldf"
+#"best_design_TM.ldf"
+#"best_design_TM_Descrovi.ldf"
+
+loaddata(file);
+
+matlabsave(file,d_layers,idx_layers,n_eff1,n_eff2,n_eff3);

@@ -7,27 +7,27 @@ n_SiO2  = 1.46+1i*1e-4;             % low refractive index
 n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 
-theta = linspace(40,56,1e4);        % angles vector
+theta = linspace(40,56,1e3);        % angles vector
 lambda = 570e-9;
 c0 = physconst('lightspeed');
 
 n_in = real(n_SiO2);
 n_out = 1;
 nA = n_Ti2O2;
-nB = n_AlO;
+nB = n_SiO2;
 nlast = n_SiO2;
 ntail = n_pmma;
 netch = n_AlO;
 
 pol  = 'p';
 
-N = 16;
+N =8;
 
-theta_lim = asin(n_out/n_in) + 3/180*pi;
+theta_lim = asin(n_out/n_in) + 1.5/180*pi;
 kB = 2*pi/lambda*real(nB)*cos(40/180*pi);
 kA = 2*pi/lambda*real(nA)*cos(40/180*pi);
 FF = 0.5;
-period = 1.1*pi/(kB*FF+kA*(1-FF));
+period = 1*pi/(kB*FF+kA*(1-FF));
 dB_0=period*FF;
 dA_0=period*(1-FF);
     
@@ -36,7 +36,7 @@ best_thicknesses = zeros(7,1);
 best_indeces = zeros(7,1);
 
 best_thicknesses(1) = 0;            % second layer above etch stop
-best_thicknesses(2) = dB_0;         % first layer above etch stop
+best_thicknesses(2) = dA_0;         % first layer above etch stop
 best_thicknesses(3) = 15e-9;        % etch stop layer
 best_thicknesses(4) = dA_0;         % layer below etch stop
 best_thicknesses(5) = dB_0;         % second layer below etch stop
@@ -53,7 +53,7 @@ best_indeces(7) = netch;            % etch stop
 
 
 %%%
-load('best_param4');
+% load('best_param1');
 n_in = best_indeces(1);        
 n_out = best_indeces(2);       
 nB = best_indeces(3);          
@@ -75,7 +75,6 @@ Partition = 0;                      % total partition
 i=1;
 rng(mod(now*1e10,2^32));
 tol=1;
-% Pm=zeros(11,400);
 
 
 
@@ -98,37 +97,39 @@ for j = 1: 1
         i=6;
     end
     
-    parameters = best_thicknesses ;
+%     parameters = best_thicknesses ;
 
-    value = best_thicknesses(i)*1e9;
-    switch i
-        case 1              
-            % pmma thickness
-            rangee = value/2;
-        case 2              
-            % last layer thickness
-            rangee = value/2;
-        case 3              
-            % AlO layer thicknes (etch stop layer)
-            rangee = value/2;
-        case 4              
-            % first below etch stop
-            rangee = value*2;
-        case 5              
-            % second below etch stop
-            rangee = value/2;
-        case 6
-            % B
-            rangee = value/2;
-        case 7
-            % A
-            rangee = value/2;
-    end
-    parameters(i) = round(value-rangee*(rand-0.5))*1e-9;
+%     value = best_thicknesses*1e9;
+%     switch i
+%         case 1              
+%             % pmma thickness
+%             rangee = value/2;
+%         case 2              
+%             % last layer thickness
+%             rangee = value/2;
+%         case 3              
+%             % AlO layer thicknes (etch stop layer)
+%             rangee = value/2;
+%         case 4              
+%             % first below etch stop
+%             rangee = value*2;
+%         case 5              
+%             % second below etch stop
+%             rangee = value/2;
+%         case 6
+%             % B
+%             rangee = value/2;
+%         case 7
+%             % A
+%             rangee = value/2;
+%     end
+    value = best_thicknesses*1e9;
+    rangee = value * 0.006;
+    parameters = round(value-rangee.*(rand(7,1)-0.5))*1e-9;
     
-    parameters(4) = parameters(7);
-    parameters(5) = parameters(6);
-    
+%     parameters(4) = parameters(7);
+%     parameters(5) = parameters(6);
+    parameters(3)=15e-9;
     tail = parameters(1);
     dlast= parameters(2);      
     detch = parameters(3);
@@ -191,15 +192,14 @@ for j = 1: 1
     
     % contribPr =utions to the partition function
     
-    min_c=0.080;
-    max_c=0.110;
+    min_c=0.050;
+    max_c=0.085;
 %     Xi(7) = threshold(contrast1a,min_c,max_c);
     Xi(8) = threshold(contrast2a,min_c,max_c);
 %     Xi(9) = threshold(contrast1b,min_c+1,max_c+1);
-    Xi(10) = threshold(contrast2b,min_c+1,max_c+1);
-     
+    Xi(10) = threshold(contrast2b,1+min_c,1+max_c);
+
     Xi_new = prod(Xi);
-%     Pm(1:end-1,j)=Xi;
     if (Xi_new > Partition) && all(n_eff > sin(theta_lim)*n_in)
         Partition = Xi_new;
         best_thicknesses = parameters;
@@ -209,15 +209,9 @@ for j = 1: 1
         nicePlot
         drawnow
     end
-%     Pm(end,j)=Partition;
 end
-% Pm=log10(Pm);
-% plot(1:400,Pm(2,:),Pm(4,:),Pm(5,:),Pm(7,:),Pm(8,:),Pm(10,:),Pm(11,:));
-% plot(1:400,10^Pm(11,:));
 
-
-
-save('best_param4','best_thicknesses','best_indeces','N')
+save('best_param3','best_thicknesses','best_indeces','N')
 
 % arbitrary partition functions
 function y =threshold(x, minimum, maximum)

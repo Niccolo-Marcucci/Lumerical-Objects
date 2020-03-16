@@ -7,14 +7,14 @@ set('name','multilayer');
 set('x',0);
 set('y',0);
 set('z',0);
-    adduserprop('data file',1,'multilayer_design/best_design.ldf');
+    adduserprop('data file',1,'multilayer_design/base_design.mat');
     adduserprop('substrate thickness',2,1e-6);
     adduserprop('domain size',2,1e-6);          # horizontal domain size
     
     myscript= " 
         deleteall;
         
-        loaddata( %data file% ); # n1 and d layers vector
+        matlabload( %data file% ); # n1 and d layers vector
         n1 = idx_layers;
         d = d_layers;
         d(1) = %substrate thickness% ;
