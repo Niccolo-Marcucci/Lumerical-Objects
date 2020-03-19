@@ -21,7 +21,7 @@ netch = n_AlO;
 
 pol  = 'p';
 
-N =8;
+N =9;
 
 theta_lim = asin(n_out/n_in) + 1.5/180*pi;
 kB = 2*pi/lambda*real(nB)*cos(40/180*pi);
@@ -78,7 +78,7 @@ tol=1;
 
 
 
-for j = 1: 1
+for j = 1: 1e4
     
     % randomize the parameter. One at a time. 
     i=i+1;
@@ -124,7 +124,7 @@ for j = 1: 1
 %             rangee = value/2;
 %     end
     value = best_thicknesses*1e9;
-    rangee = value * 0.006;
+    rangee = value * 0.6;
     parameters = round(value-rangee.*(rand(7,1)-0.5))*1e-9;
     
 %     parameters(4) = parameters(7);

@@ -1,4 +1,4 @@
-close all;
+% close all;
 clear;
 addpath('functions');
 
@@ -13,7 +13,7 @@ lambda=570e-9;
 
 % the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
 load('best_param1');%num2str(kkk)
-% N=10;  
+% N=9;  
 % best_thicknesses;
 % best_indeces;
 
@@ -103,8 +103,8 @@ legend('With last layer', 'Without last layer');
 nicePlot
 
 idx_layers=n1;
-d_layers=d1
+d_layers=d1;
 n_eff1=n_eff(1);
 n_eff2=n_eff(2);
 n_eff3=n_eff(3);
-save designs/best_design_TM_bad idx_layers d_layers n_eff1 n_eff2 n_eff3
+save designs/best_design_TM_bad_N9 idx_layers d_layers n_eff1 n_eff2 n_eff3

@@ -2,7 +2,7 @@ clear
 close all
 addpath('functions');
 
-% load designs/design_TM_Descrovi.mat   
+load designs/design_TM_Descrovi.mat   
 pol='p';
 
 d1=d_layers;
