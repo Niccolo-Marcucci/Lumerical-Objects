@@ -2,15 +2,15 @@ clear
 close all
 addpath('functions');
 
-load designs/design_TM_Descrovi.mat   
+load designs/design_TM_guided.mat   
 pol='p';
 
 d1=d_layers;
 n1=idx_layers;
-d1(end)=5e-6;
+d1(end)=3e-6;
 
 lambda=570e-9;
-theta = linspace(40,56,1e4);  
+theta = linspace(40,60,1e4);  
 
 for k = 1:2
     n = [n1(1:end-k) ; n1(end)];
@@ -31,7 +31,7 @@ for k = 1:2
                                                 r(idx),t(idx),pol);
     figure(2)
     hold on
-    plot(z1,2*P)
+    plot(z1,P)
 end
 
 
@@ -55,7 +55,7 @@ nicePlot
 
 
 folder="~/OneDrive/BSW/Pictures/";
-name=strcat(folder,"TM_Descrovi_Field_distribution");
-% saveas(figure(2),name,'png')
-name=strcat(folder,"TM_Descrovi_BWS_lines");
-% saveas(figure(1),name,'png')
+name=strcat(folder,"TM_guided_Field_distribution");
+saveas(figure(2),name,'png')
+name=strcat(folder,"TM_guided_BWS_lines");
+saveas(figure(1),name,'png')

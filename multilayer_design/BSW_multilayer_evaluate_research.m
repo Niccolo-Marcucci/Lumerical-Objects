@@ -1,4 +1,4 @@
-% close all;
+close all;
 clear;
 addpath('functions');
 
@@ -8,11 +8,11 @@ n_SiO2  = 1.46+1i*1e-4;             % low refractive index
 n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 
-theta = linspace(40,56,1e4);                    % angle vector
+theta = linspace(29,56,1e4);                    % angle vector
 lambda=570e-9;
 
 % the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
-load('best_param1');%num2str(kkk)
+load('best_param4');%num2str(kkk)
 % N=9;  
 % best_thicknesses;
 % best_indeces;
@@ -84,7 +84,7 @@ for k = 2:3
                                                 r(idx),t(idx),pol);
     figure(2)
     hold on
-    plot(z1,2*P)
+    plot(z1,P)
         
 end  
 n_eff(1)=n_eff(2);
@@ -107,4 +107,4 @@ d_layers=d1;
 n_eff1=n_eff(1);
 n_eff2=n_eff(2);
 n_eff3=n_eff(3);
-save designs/best_design_TM_bad_N9 idx_layers d_layers n_eff1 n_eff2 n_eff3
+save designs/design_TM_guided idx_layers d_layers n_eff1 n_eff2 n_eff3

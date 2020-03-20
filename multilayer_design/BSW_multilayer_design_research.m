@@ -7,11 +7,11 @@ n_SiO2  = 1.46+1i*1e-4;             % low refractive index
 n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 
-theta = linspace(40,56,1e3);        % angles vector
+theta = linspace(29,44,1e3);        % angles vector
 lambda = 570e-9;
 c0 = physconst('lightspeed');
 
-n_in = real(n_SiO2);
+n_in =  real(2);
 n_out = 1;
 nA = n_Ti2O2;
 nB = n_SiO2;
@@ -21,7 +21,7 @@ netch = n_AlO;
 
 pol  = 'p';
 
-N =9;
+N=7;
 
 theta_lim = asin(n_out/n_in) + 1.5/180*pi;
 kB = 2*pi/lambda*real(nB)*cos(40/180*pi);
@@ -211,7 +211,7 @@ for j = 1: 1e4
     end
 end
 
-save('best_param3','best_thicknesses','best_indeces','N')
+save('best_param2','best_thicknesses','best_indeces','N')
 
 % arbitrary partition functions
 function y =threshold(x, minimum, maximum)
