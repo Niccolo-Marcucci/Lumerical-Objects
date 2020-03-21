@@ -107,4 +107,6 @@ d_layers=d1;
 n_eff1=n_eff(1);
 n_eff2=n_eff(2);
 n_eff3=n_eff(3);
-save designs/design_TM_guided idx_layers d_layers n_eff1 n_eff2 n_eff3
+name='designs/design_TM_guided';
+% stopBeforeSaving(name)
+% save(name,'idx_layers','d_layers','n_eff1','n_eff2','n_eff3')

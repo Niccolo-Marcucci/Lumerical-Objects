@@ -30,7 +30,8 @@ FF = 0.5;
 period = 1*pi/(kB*FF+kA*(1-FF));
 dB_0=period*FF;
 dA_0=period*(1-FF);
-    
+
+param_file='best_param1';
 
 best_thicknesses = zeros(7,1);
 best_indeces = zeros(7,1);
@@ -211,7 +212,7 @@ for j = 1: 1e4
     end
 end
 
-save('best_param2','best_thicknesses','best_indeces','N')
+save(param_file,'best_thicknesses','best_indeces','N')
 
 % arbitrary partition functions
 function y =threshold(x, minimum, maximum)

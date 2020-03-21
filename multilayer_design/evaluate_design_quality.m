@@ -56,6 +56,7 @@ nicePlot
 
 folder="~/OneDrive/BSW/Pictures/";
 name=strcat(folder,"TM_guided_Field_distribution");
+stopBeforeSaving(name)
 saveas(figure(2),name,'png')
 name=strcat(folder,"TM_guided_BWS_lines");
 saveas(figure(1),name,'png')

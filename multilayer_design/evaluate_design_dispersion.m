@@ -33,6 +33,7 @@ whitebg(figure(1),'black');
 set(gcf, 'InvertHardCopy', 'off');
 folder="~/OneDrive/BSW/Pictures/";
 name=strcat(folder,"TM_guided_dispersion_beta");
+stopBeforeSaving(name)
 saveas(figure(1),name,'png')
 
 figure('units','normalized','outerposition',[0 0 1 1])
