@@ -12,7 +12,7 @@ theta = linspace(29,56,1e4);                    % angle vector
 lambda=570e-9;
 
 % the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
-load('best_param4');%num2str(kkk)
+load('best_param6');
 % N=9;  
 % best_thicknesses;
 % best_indeces;
@@ -95,8 +95,9 @@ n_eff(1)/n_eff(3)
 
 [z1, nz] = field_distribution(lambda,theta(idx),d1,n1);
 figure(2);
-plot(z1,real(nz)*400);
-legend('Field with last layer', 'Field without last layer', 'Refreactive index x 400');
+plot(z1,real(nz-1)*400);
+legend('Field with last layer', 'Field without last layer',...
+                                                '(n_z- 1) x 400');
 nicePlot
 figure(1);
 legend('With last layer', 'Without last layer');
@@ -107,6 +108,6 @@ d_layers=d1;
 n_eff1=n_eff(1);
 n_eff2=n_eff(2);
 n_eff3=n_eff(3);
-name='designs/design_TM_guided';
+name='designs/design_TM8_SiO2';
 % stopBeforeSaving(name)
 % save(name,'idx_layers','d_layers','n_eff1','n_eff2','n_eff3')

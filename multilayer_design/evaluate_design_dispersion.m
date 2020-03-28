@@ -1,11 +1,13 @@
 clear, 
 % close all
 
-theta_v = [linspace(0,90,5e3)];% , asin(linspace(1,2,2e3))/pi*180                   
-lambda_v=linspace(400,800,5e3)*1e-9;
+theta_v = [linspace(0,90,2e3)];% , asin(linspace(1,2,2e3))/pi*180
+lambda_v=linspace(400,800,2e3)*1e-9;
 addpath('functions');
 
-load designs/design_TM7_thickDesign.mat
+design_name = "TM_guidedDesc";
+design_file = strcat("designs/design_",design_name,".mat");
+load(design_file)
 pol='p';
 
 [d,n,~,~] = prepare_multilayer(d_layers,...
@@ -24,7 +26,7 @@ beta=real(sin(theta/180*pi))*2*pi*n(1)./lambda;
 c=physconst('lightspeed');
 f=figure('units','normalized','outerposition',[0 0 1 1]);
 omega=2*pi*c./lambda;
-s=surf(beta,omega,1-R);
+s=surf(beta,omega,(1-R));
 ylabel('angular frequency')
 xlabel('beta')
 s.EdgeColor='none';
@@ -58,7 +60,7 @@ xlim([0 2.5e7])
 %%
 set(gcf, 'InvertHardCopy', 'off');
 folder="~/OneDrive/BSW/Pictures/";
-name=strcat(folder,"TM7_thickDesign_dispersion_beta");
+name=strcat(folder,design_name,"_dispersion_beta");
 stopBeforeSaving(name)
 saveas(figure(1),name,'png')
 
@@ -85,6 +87,6 @@ if pol == 'p'
 end
 set(gcf, 'InvertHardCopy', 'off');
 folder="~/OneDrive/BSW/Pictures/";
-name=strcat(folder,"TM7_thickDesign_dispersion_theta");
+name=strcat(folder,design_name,"_dispersion_theta");
 saveas(figure(2),name,'png')
 %%

@@ -6,14 +6,17 @@ n_AlO   = 1.65+1i*1e-4;             % low refractive index
 n_SiO2  = 1.46+1i*1e-4;             % low refractive index
 n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
+n_high  = 3.00+1i*1e-4;
+n_low   = 2.00+1i*1e-4;
 
-theta = linspace(29,44,1e3);        % angles vector
+
+theta = linspace(40,56,1e3);        % angles vector
 lambda = 570e-9;
 c0 = physconst('lightspeed');
 
-n_in =  real(2);
+n_in =  real(n_SiO2);
 n_out = 1;
-nA = n_Ti2O2;
+nA = n_high;
 nB = n_SiO2;
 nlast = n_SiO2;
 ntail = n_pmma;
@@ -21,7 +24,7 @@ netch = n_AlO;
 
 pol  = 'p';
 
-N=7;
+N=8;
 
 theta_lim = asin(n_out/n_in) + 1.5/180*pi;
 kB = 2*pi/lambda*real(nB)*cos(40/180*pi);
@@ -31,7 +34,7 @@ period = 1*pi/(kB*FF+kA*(1-FF));
 dB_0=period*FF;
 dA_0=period*(1-FF);
 
-param_file='best_param1';
+param_file='best_param6';
 
 best_thicknesses = zeros(7,1);
 best_indeces = zeros(7,1);
@@ -194,7 +197,7 @@ for j = 1: 1e4
     % contribPr =utions to the partition function
     
     min_c=0.050;
-    max_c=0.085;
+    max_c=0.115;
 %     Xi(7) = threshold(contrast1a,min_c,max_c);
     Xi(8) = threshold(contrast2a,min_c,max_c);
 %     Xi(9) = threshold(contrast1b,min_c+1,max_c+1);
