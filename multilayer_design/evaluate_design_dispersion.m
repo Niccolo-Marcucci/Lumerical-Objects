@@ -5,7 +5,7 @@ theta_v = [linspace(0,90,2e3)];% , asin(linspace(1,2,2e3))/pi*180
 lambda_v=linspace(400,800,2e3)*1e-9;
 addpath('functions');
 
-design_name = "TM_guidedDesc";
+design_name = "TM_gd3_buriedDBR";
 design_file = strcat("designs/design_",design_name,".mat");
 load(design_file)
 pol='p';
@@ -55,6 +55,7 @@ plot3(beta,omega_crit,[1 1],'--w','linewidth',3)
 if pol == 'p'
     plot3(beta,omega_brew,[1 1],'--g','linewidth',3)
 end
+plot3(beta,2*pi*c/570e-9*[1 1],[1 1],'--m')
 ylim([omega(end,end) omega(1,1)])
 xlim([0 2.5e7])
 %%
@@ -85,6 +86,7 @@ if pol == 'p'
    plot3(real(theta_brew)*[1 1]*180/pi,[lambda_v(1),lambda_v(end)],...
                                         [1 1],'--g','linewidth',3)
 end
+plot3([theta_v(1) theta_v(end)],570e-9*[1 1],[1 1],'--m')
 set(gcf, 'InvertHardCopy', 'off');
 folder="~/OneDrive/BSW/Pictures/";
 name=strcat(folder,design_name,"_dispersion_theta");
