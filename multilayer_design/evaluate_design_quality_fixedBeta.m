@@ -2,20 +2,21 @@ clear
 close all
 addpath('functions');
 
-% design general properties
 design_name = "TM_gd3_buriedDBR";
 design_file = strcat("designs/design_",design_name,".mat");
 load(design_file);
 pol='p';                            % polarisation: 'p' or 's'
 design_type='buried';               % either 'buried' or empty
-
-lambda=570e-9;
-theta = linspace(40,70,1e4);
-
+lambda_DBR = 165e-9;                % determines the beta at which the
+                                    % reflectivity is computed (see
+                                    % usage).
 d1=d_layers;
 n1=idx_layers;
 
-[d1,n1] = prepare_multilayer(d1,n1);
+beta = pi/lambda_DBR;
+lambda = linspace(500,640,1e4)*1e-9;
+K = 2*pi./lambda*n1(1);
+theta = asin(beta./K)/pi*180;
 
 for k = 1:2
     if strcmp(design_type,'buried')
@@ -27,31 +28,35 @@ for k = 1:2
         d = [d1(1:end-k) ; d1(end)];
     end
     
+    R = zeros(1,length(lambda));
+    r = zeros(1,length(lambda));
+    t = zeros(1,length(lambda));
+     
     [dr,nr,~,~] = prepare_multilayer(d,n);
-    
-    [R,r,t] = reflectivity(lambda,theta,dr,nr,pol);
+    for i=1:length(lambda)
+        [R(i),r(i),t(i)] = reflectivity(lambda(i),theta(i),dr,nr,pol);
+    end
     [pks,idxs] = findpeaks(1-R);
     [~,pk_ix] = max(pks);
     idx = idxs(pk_ix);
-    
-    n_eff= sin(theta(idx)*pi/180)*n(1);
+%     n_eff(k)= sin(theta(idx)*pi/180)*nr(1);
+
     
     figure(1)
     hold on
-    plot(theta,R)
-    text(theta(idx),0.5+R(idx)/2,...
-            strcat(" n_{eff}=",string(n_eff)),'fontsize',14);
+    plot(lambda*1e9,R)
 
-    [z1, ~,P ] = field_distribution(lambda,theta(idx),d,n,...
-                                                r(idx),t(idx),pol);
+    [z1, ~, P ] = field_distribution(lambda(idx),theta(idx),d,n,...
+                                                   r(idx),t(idx),pol);
     figure(2)
     hold on
     plot(z1,P)
+
 end
 
 [d1,n1] = prepare_multilayer(d1,n1);
 
-[z1, nz] = field_distribution(lambda,theta(idx),d1,n1);
+[z1, nz] = field_distribution(lambda(idx),theta(idx),d1,n1);
 figure(2);
 plot(z1,real(nz-1)*400  );
 xlabel('z [m]')
@@ -63,19 +68,17 @@ else
     legend('Field with last layer','Field without last layer',...
                                                 '(n_z -1) x 400');
 end
-title(create_design_title(design_file))
 nicePlot
 
 figure(1);
-ylim([0.2,1])
-xlabel('Incidence angle [degrees]')
+plot(570*[1 1],[1e-3 1],'--k')
+xlabel('wavelength [nm]')
 ylabel('Reflectivity')
 if strcmp(design_type,'buried')
     legend('Without buried layer','With buried layer');
 else
     legend('With last layer','Without last layer');
 end
-title(create_design_title(design_file))
 nicePlot
 % set(gca,'yscale','log')
 
