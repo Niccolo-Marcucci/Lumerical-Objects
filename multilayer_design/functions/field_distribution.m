@@ -1,20 +1,27 @@
-function [z, nz, P, field] = field_distribution(lambda,theta,d,n,r,t,pol)
+% Computes the field distribution inside a dielectric multilayer
+% stack. 
+% - The output is computed on the normalized H_tilde=Z0*H;
+% - The reolution parameter can be neglected
+% - The function can be used also to etract only nz. in this case use
+%   in the form:
+%   [z, nz] = field_distribution(lambda,theta,d,n,'',res)
+function [z, nz, P, field] = field_distribution(lambda,theta,d,n,pol,res)
 
-K=2*pi/lambda;
-c0 = 299792458;
-Z0 = 376.7303136;
-[d,n,dsub,dair] = prepare_multilayer(d,n);
-% d(1) and d(end) are set to zero
-
-% determining an optimal resolution, 20 points on the thinnest layer
-step = min(d(d~=0))/20;
+[d,n,dsub,dair] = prepare_multilayer(d,n);  % check fun description 
+                                            % for more details.                                      
+% determining an optimal resolution, 50 points on shortest wavelegth
+if nargin < 6
+    res = 50;
+end
+step = lambda/max(real(n))/res;
 sz = round(sum(d)/step);          % size of z vector
 z  = linspace(0,sum(d),sz);
 nz = ones(1,sz);
-
 step = z(2)-z(1);
 
-% create nz vector
+% create nz vector: if a point is located exactly at an interface, it
+% will be cosidered to belong to the layer on the right hand side of
+% the interface
 j=1;
 zv=cumsum(d);
 za=zv(j);
@@ -48,20 +55,26 @@ if nargout < 3
     z  = [z_sub,   z, z_air+z(end)];
     nz = [nz_sub, nz, nz_air];
     return
-elseif length(theta) ~= 1 || length(r) ~= 1 || length(lambda) ~= 1
+elseif length(theta) ~= 1 || length(lambda) ~= 1
     error('Inputs should be scalars')
-end
-
-theta=theta/180*pi;
-beta = n(1)*sin(theta);
-costheta = sqrt(n.^2-beta^2)./n;
+end 
 
 % TMM applied from left to right, where
 %   Eout = T * Ein
 %   i.e. field on te right of the interface is equal to matrix T times
-%   field on the left (assuming input field comes from the left
-% 
+%   field on the left (assuming input field comes from the left)
+% Check the appendix for more info.
 
+% first of all extract the reflected field at the first interface
+[~,r] = reflectivity(lambda,theta,d,n,pol); 
+
+% determine wave direction in each layer
+K=2*pi/lambda;
+theta = theta/180*pi;
+beta = n(1)*sin(theta);
+costheta = sqrt(n.^2-beta^2)./n;  
+
+% and now propagate the fields
 E = zeros(2,sz);
 E_air = zeros(2,sz_air);
 E_sub = zeros(2,sz_sub);
@@ -98,20 +111,46 @@ E_sub(1,:) = E(1,1)*exp(+1i*K*nz(1)*costheta(1)*z_sub);
 E_sub(2,:) = E(2,1)*exp(-1i*K*nz(1)*costheta(1)*z_sub);
 E=[E_sub, E, E_air];
 
-if nargout > 3    
-    H_correction=nz/Z0;
-    
-    field.Er = E(1,:);
-    field.El = E(2,:);
-    
-    field.Hr = E(1,:)*H_correction;
-    field.Hl = E(2,:)*H_correction;
-end
 
+% apply Maxwell equations in order to extract H and E
+costheta_z = sqrt(nz.^2-beta^2)./nz;
 if pol == 'p'
-    P = abs(sum(E).*nz).^2/2;
+    % In order to determine Ey and Ez it is necessary to take into
+    % account the conventions of signs with which the Fresnel 
+    % coefficient have been analytically derived. 
+    % Check the appendix for more info.
+    sintheta_z = beta./nz;
+    
+    field.Ery = E(1,:).*costheta_z;
+    field.Ely = E(2,:).*costheta_z;
+    field.Erz =-E(1,:).*sintheta_z;
+    field.Elz =+E(2,:).*sintheta_z;
+    field.Ey = field.Ery - field.Ely;
+    field.Ez = field.Erz - field.Elz;
+    
+    field.Hrx = beta*field.Erz - nz.*costheta_z.*field.Ery;
+    field.Hlx =-beta*field.Elz - nz.*costheta_z.*field.Ely; 
+    field.Hx = field.Hrx + field.Hlx;
+    
+    P = abs(field.Hx).^2/2;
 else
-    P = abs(sum(E)).^2/2;
+    
+    % With s-polarisation the sign convention is much easier. We
+    % simply apply the third Maxwell equation
+    % Check the appendix for more info.
+    
+    field.Erx = E(1,:);
+    field.Elx = E(2,:);
+    field.Ex = field.Erx + field.Elx;
+    
+    field.Hry = nz.*costheta_z.*field.Erx;
+    field.Hly =-nz.*costheta_z.*field.Elx;
+    field.Hrz =-beta*field.Erx;
+    field.Hlz =-beta*field.Elx;
+    
+    field.Hy = field.Hry + field.Hly;
+    field.Hz = field.Hrz + field.Hlz;
+    
+    P = abs(field.Ex).^2/2;
 end
-
 end

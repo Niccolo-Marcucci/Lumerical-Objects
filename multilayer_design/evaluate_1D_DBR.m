@@ -76,7 +76,7 @@ xlabel('wavelength [nm]')
 ylabel('reflectance')
 xlim([500 650])
 
-% [z,nz]=field_distribution(570,0,d,n);
+% [z,nz]=field_distribution(570,0,d,n,'',5e2);
 % figure
 % plot(z,nz)
 % nicePlot

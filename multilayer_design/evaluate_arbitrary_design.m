@@ -96,8 +96,7 @@ for k =1:2
     hold on
     plot(theta,R)
     
-    [z, ~, P] = field_distribution(lambda,theta(idx),d,n,...
-                                                r(idx),t(idx),pol);
+    [z, ~, P] = field_distribution(lambda,theta(idx),d,n,pol);
     figure(2)
     hold on
     plot(z,P)

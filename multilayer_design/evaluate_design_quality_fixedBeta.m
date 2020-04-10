@@ -30,11 +30,10 @@ for k = 1:2
     
     R = zeros(1,length(lambda));
     r = zeros(1,length(lambda));
-    t = zeros(1,length(lambda));
      
     [dr,nr,~,~] = prepare_multilayer(d,n);
     for i=1:length(lambda)
-        [R(i),r(i),t(i)] = reflectivity(lambda(i),theta(i),dr,nr,pol);
+        [R(i),r(i)] = reflectivity(lambda(i),theta(i),dr,nr,pol);
     end
     [pks,idxs] = findpeaks(1-R);
     [~,pk_ix] = max(pks);
@@ -46,8 +45,7 @@ for k = 1:2
     hold on
     plot(lambda*1e9,R)
 
-    [z1, ~, P ] = field_distribution(lambda(idx),theta(idx),d,n,...
-                                                   r(idx),t(idx),pol);
+    [z1, ~, P ] = field_distribution(lambda(idx),theta(idx),d,n,pol);
     figure(2)
     hold on
     plot(z1,P)

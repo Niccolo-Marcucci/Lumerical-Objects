@@ -29,7 +29,7 @@ for k = 1:2
     
     [dr,nr,~,~] = prepare_multilayer(d,n);
     
-    [R,r,t] = reflectivity(lambda,theta,dr,nr,pol);
+    [R,r] = reflectivity(lambda,theta,dr,nr,pol);
     [pks,idxs] = findpeaks(1-R);
     [~,pk_ix] = max(pks);
     idx = idxs(pk_ix);
@@ -41,9 +41,8 @@ for k = 1:2
     plot(theta,R)
     text(theta(idx),0.5+R(idx)/2,...
             strcat(" n_{eff}=",string(n_eff)),'fontsize',14);
-
-    [z1, ~,P ] = field_distribution(lambda,theta(idx),d,n,...
-                                                r(idx),t(idx),pol);
+        
+    [z1, ~,P ] = field_distribution(lambda,theta(idx),d,n,pol);
     figure(2)
     hold on
     plot(z1,P)
@@ -51,7 +50,7 @@ end
 
 [d1,n1] = prepare_multilayer(d1,n1);
 
-[z1, nz] = field_distribution(lambda,theta(idx),d1,n1);
+[z1, nz] = field_distribution(lambda,theta(idx),d1,n1,'',1e3);
 figure(2);
 plot(z1,real(nz-1)*400  );
 xlabel('z [m]')
