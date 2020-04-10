@@ -3,8 +3,8 @@ function stopBeforeSaving(name)
 w=warndlg("Check Command line instruction","warn");
 close(w)
 
-input(strcat("\nDo you wand to save the file as '",name,...
+input(strcat("\nDo you wand to save the file as \n'",name,...
                  "' ? \n Press enter to continue",...
                  "\n otherwize stop the excecution otherwise."));
-    
+
 end

@@ -1,18 +1,17 @@
 % This function computes the reflectivity and trasmissivity of a
 % dielectric multilayer stack. The multilayer vector has to include
 % the substrate (as first element) and the external medium (as lat
-% layer). 
-% The thickness of these two layers will not matter, since the
-% computation will start at the first interface and will end at the
-% last one. Indeed the values of the field r and t will be computed at
-% such interfaces. 
+% layer). The thickness of the latter will not matter, since the
+% computation will end on the right side of the last interface.
+%  The multilayer stack should not contain layers having zero
+%  thickness. In order to remove them see the function 
+%  "prepare_multilayer.m"
+%
+% If the first layer thickness is set to zero the input field (and the
+% computed reflected field) will be located on the left side of the
+% first interface.
 
 function [R,r,t,Tr] = reflectivity (lambda,theta_in,d,n,pol)
-
-% if you propose a multilayer which is altready optimized for this
-% calculation (i.e. no dummy layers and no zero thicknes layers), you
-% can comment the next line and save some computational time.
-% [d,n] = prepare_multilayer(d,n);
 
 N_layers = length(d);
 
@@ -57,7 +56,7 @@ for i=1:size_T
 
         end
 
-        % expicit matrix product for speed.
+        % expicit matrix product for increasing the speed.
         rtij = rji/tji;
         T11t = Pr/tji*T11 + rtij*Pl*T21;
         T12t = Pr/tji*T12 + rtij*Pl*T22;
@@ -68,7 +67,7 @@ for i=1:size_T
         T21 = T21t;
         T22 = T22t;
         
-        % next is kept as a reminder
+        % next two lines are kept as a reminder
         % T=Tij*P*T; 
         % D=D*P*Dijc;
     end
