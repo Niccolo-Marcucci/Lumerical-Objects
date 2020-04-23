@@ -22,18 +22,19 @@
 # (hence the name chosen for the various properties).
 
 addstructuregroup;
-set('name','spiral outcoupler');
+set('name','metasurface outcoupler');
 set('x',0);
 set('y',0);
 set('z',0);
     adduserprop('material groove',5,'<Object defined dielectric>');
     adduserprop('index groove',0,1);
     adduserprop('N rings',0,10);             # high refreactive index layer
-    adduserprop('topological charge',0,2);   # number of arms of the spiral
+    adduserprop('topological charge',0,0);   # number of arms of the spiral
     adduserprop('thickness',2,0.1e-6);          # thickness
-    adduserprop('resolution',0,50);	     # number of points used for creating the spiral
+    adduserprop('rectangular element tilt',2,45);	
+    adduserprop('pattern type',1,'radial');	# options: 'filled', 'radial','radial filled'
     adduserprop('start radius',2,1.5e-6);
-    adduserprop('dbr period',2,0.25e-6);
+    adduserprop('period',2,0.25e-6);
     adduserprop('fill factor',0,0.5);
     adduserprop('z min',2,0);
     
@@ -43,12 +44,13 @@ set('z',0);
         index_out = %index groove%;
         n_rings = %N rings%;
         start_radius = %start radius%;
-        lambda = %dbr period%;
+        lambda = %period%;
         n_arms = %topological charge%;
         FF = %fill factor%;
         D=start_radius*2;
-        
-        resolution = 2*resolution*n_rings;  # even value required
+        scatter_tilt = %rectangular element tilt%/180*pi;
+        type = %pattern type%;
+        resolution = 50;  # even value required
         
         radius = matrix(resolution/2);        # radius, function of theta
         theta = matrix(resolution/2);
@@ -63,13 +65,13 @@ set('z',0);
            # Each arm opf the spiral is defined by a polygon 
            for (j=0:abs(n_arms)-1) { 
               # define theta   
-              theta= linspace(0,2*pi*n_rings/n_arms,resolution/2);
+              theta(1:resolution/2) = linspace(0,2*pi*n_rings/n_arms,resolution/2);
+              theta((resolution/2+1):resolution) = linspace(2*pi*n_rings/n_arms,0,resolution/2);
               # parametrize the radius
-              radius(1:resolution/2) = start_radius+lambda*theta/(2*pi/n_arms);
-              vertices(1,1:resolution/2) = radius*cos(theta+2*pi*j/n_arms);		
-              vertices(2,1:resolution/2) = radius*sin(theta+2*pi*j/n_arms);
-              vertices(1,end:-1:resolution/2+1) = (radius+lambda*FF)*cos(theta+2*pi*j/n_arms);
-              vertices(2,end:-1:resolution/2+1) = (radius+lambda*FF)*sin(theta+2*pi*j/n_arms);
+              radius(1:resolution/2) = linspace(start_radius,start_radius+lambda*n_rings,resolution/2);
+              radius((resolution/2+1):resolution) = linspace(start_radius+lambda*n_rings+lambda*FF,start_radius+lambda*FF,resolution/2);
+              vertices(1,1:resolution) = radius*cos(theta+2*pi*j/n_arms);		
+              vertices(2,1:resolution) = radius*sin(theta+2*pi*j/n_arms);
             
               # add polygon object and set properties
               addpoly;		
@@ -100,22 +102,38 @@ set('z',0);
         } else {
            if (n_rings!=0) {
            for (n = 1:n_rings){
-                addring;
-                set('name','groove' + num2str(n));
-                set('x',0);
-                set('y',0);
-                set('inner radius',D/2+(n-1)*lambda);
-                set('outer radius',D/2+(n-0.5)*lambda);
-                set('z min',%z min%);
-                set('z max',%z min%+thickness);
-                set('material',material_out);
-                if(get('material')=='<Object defined dielectric>') 
-                    { set('index',index_out); }
-                set('theta start',0);
-                set('theta stop',360);
-                set('index', index_out);
+                alpha=scatter_tilt;
+                radius = D/2+(n-1/2)*lambda;
+                if (type == 'filled') {
+                    n_scatter = round(2*pi*radius/lambda);
+                    sc_length = 2*pi*radius/n_scatter;
+                }else if (type == 'radial') {
+                    n_scatter = round(2*pi*start_radius/lambda);
+                    sc_length = 2*pi*start_radius/n_scatter;
+                }else if (type == 'radial filled') {
+                    n_scatter = round(2*pi*start_radius/lambda);
+                    sc_length = 2*pi*radius/n_scatter;
+                }else {
+                    error;
+                }
+                sc_width = lambda*FF*cos(alpha);
+                for ( k = 1:n_scatter ) {
+                    location_tilt = 2*pi/n_scatter*k;
+                    
+                    tilt = (pi/2 + scatter_tilt + location_tilt)/pi*180;
+                    addrect;
+                        set('name','base');
+                        set('x',radius*cos(location_tilt));
+                        set('x span',sc_length);
+                        set('y',radius*sin(location_tilt));
+                        set('y span',sc_width);
+                        set('z min',0);
+                        set('z max',thickness);
+                        set('first axis','z');
+                        set('rotation 1',tilt);
+                }
             }}
         }
     ";
     
-set('script',myscript); 
+set('script',myscript);
