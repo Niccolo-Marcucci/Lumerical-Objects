@@ -32,7 +32,7 @@ set('z',0);
     adduserprop('topological charge',0,0);   # number of arms of the spiral
     adduserprop('thickness',2,0.1e-6);          # thickness
     adduserprop('resolution',0,50);	     # number of points used for creating the spiral
-    adduserprop('rectangle tilt',2,-45);	
+    adduserprop('groove tilt',0,45);	
     adduserprop('start radius',2,1.5e-6);
     adduserprop('period',2,0.25e-6);
     adduserprop('fill factor',0,0.5);
@@ -48,7 +48,7 @@ set('z',0);
         n_arms = %topological charge%;
         FF = %fill factor%;
         D=start_radius*2;
-        scatter_tilt = %rectangle tilt%/180*pi;
+        scatter_tilt = %groove tilt%/180*pi;
         resolution = 2*resolution*n_rings;  # even value required
         
         radius = matrix(resolution/2);        # radius, function of theta
@@ -97,7 +97,7 @@ set('z',0);
             }
         } else {
            if (n_rings!=0) {
-            alpha=scatter_tilt;
+            alpha=-scatter_tilt;
             n_scatter = round(2*pi*start_radius/lambda);
             sc_length = 2*pi*radius/n_scatter;
             sc_width = lambda*FF*cos(alpha);

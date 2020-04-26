@@ -1,0 +1,107 @@
+# Copyright 2020 Niccolò Marcucci <niccolo.marcucci@polito.it>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+###########################################2*pi###############################
+
+# This file creates a spiral shaped structure in which it is possible to set
+# the number of arms, the internal diameter, the period of the spiral and the  
+# number of turns the arms do (actually it sets the number of periods seen 
+# radially, from the center outwards).
+# This spiral structure can be used for creating grooves onto a dielectric layer
+# (hence the name chosen for the various properties).
+deleteall;
+addstructuregroup;
+set('name','radial outcoupler');
+set('x',0);
+set('y',0);
+set('z',0);
+    adduserprop('material groove',5,'<Object defined dielectric>');
+    adduserprop('index groove',0,1);
+    adduserprop('N rings',0,10);             # high refreactive index layer
+    adduserprop('topological charge',0,0);   # number of arms of the spiral
+    adduserprop('thickness',2,0.1e-6);          # thickness
+    adduserprop('resolution',0,50);	     # number of points used for creating the spiral
+    adduserprop('start radius',2,1.5e-6);
+    adduserprop('period',2,0.25e-6);
+    adduserprop('fill factor',0,0.5);
+    adduserprop('z min',2,0);
+    
+    myscript= " 
+        deleteall;
+        material_out = %material groove%;
+        n_groove = %index groove%;
+        n_rings = %N rings%;
+        start_radius = %start radius%;
+        lambda = %period%;
+        n_arms = %topological charge%;
+        FF = %fill factor%;
+        D=start_radius*2;
+        resolution = 2*resolution*n_rings;  # even value required
+        
+        radius = matrix(resolution/2);        # radius, function of theta
+        theta = matrix(resolution/2);
+        vertices = matrix(2,resolution);
+        
+        int_res=15;
+        r_n=matrix(int_res);
+        the=matrix(int_res);
+        vert=matrix(2,int_res);
+        
+        if (n_arms != 0) {
+            # Each arm opf the spiral is defined by a polygon 
+            for (j=0:abs(n_arms)-1) { 
+            n_scatter = round(2*pi/n_arms*start_radius/lambda)*n_arms;
+            Dtheta=2*pi/n_scatter/pi*180;
+            
+            for ( k = 1:n_scatter/n_arms) {
+                # add polygon object and set properties
+                addring;
+                    set('name','groove'  + num2str(j)+'.'+ num2str(k));
+                    set('x',0);
+                    set('y',0);
+                    set('inner radius',start_radius+lambda*(Dtheta*k/360*n_arms));
+                    set('outer radius',start_radius+n_rings*period+lambda*Dtheta*k/360);
+                    set('z min',%z min%);
+                    set('z max',%z min%+thickness);
+                    set('theta start',Dtheta*k+j*360/n_arms);
+                    set('theta stop',Dtheta*(k+FF)+j*360/n_arms);
+                    set('material','<Object defined dielectric>');
+                    set('index', n_groove);
+                }
+            }
+        } else {
+           if (n_rings!=0) {
+            n_scatter = round(2*pi*start_radius/lambda);
+            Dtheta=2*pi/n_scatter/pi*180;
+            
+            for ( k = 1:n_scatter ) {
+                # add polygon object and set properties
+                addring;
+                    set('name','groove' + num2str(k));
+                    set('x',0);
+                    set('y',0);
+                    set('inner radius',start_radius);
+                    set('outer radius',start_radius+n_rings*period);
+                    set('z min',%z min%);
+                    set('z max',%z min%+thickness);
+                    set('theta start',Dtheta*k);
+                    set('theta stop',Dtheta*(k+FF));
+                    set('material','<Object defined dielectric>');
+                    set('index', n_groove);
+                }
+            }
+        }
+    ";
+    
+set('script',myscript);
