@@ -20,7 +20,7 @@
 # radially, from the center outwards).
 # This spiral structure can be used for creating grooves onto a dielectric layer
 # (hence the name chosen for the various properties).
-deleteall;
+
 addstructuregroup;
 set('name','radial outcoupler');
 set('x',0);
