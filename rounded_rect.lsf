@@ -1,0 +1,74 @@
+# Copyright 2020 Niccolò Marcucci <niccolo.marcucci@polito.it>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+##########################################################################
+
+
+### This file creates rectangular parallelepiped having rounded (circular)
+### corners. Only those corners perpendicular to the xy-plane are smoothed.
+
+addstructuregroup;
+set('name','rounded rect');
+set('x',0);
+set('y',0);
+set('z',0);
+    adduserprop('index',0,1.5);
+    adduserprop('x span',2,1e-6);
+    adduserprop('y span',2,1e-6);
+    adduserprop('z span',2,0.5e-6);
+    adduserprop('radius',2,0.1e-6);    # refractive index of the first and 
+    
+    myscript= '
+        deleteall;     
+        x_span = %x span%;
+        y_span = %y span%;
+        z_span = %z span%;
+        
+        # co-ordinates of the corners
+        x=[-1, 1]*(x_span/2-radius);
+        y=[-1, 1]*(y_span/2-radius);
+        
+        # central rectangles
+        addrect;
+         set("x",0);
+         set("y",0);
+         set("z",0);
+         set("x span",x_span);
+         set("y span",y_span-2*radius);
+         set("z span",z_span);
+         set("index",index);
+        addrect;
+         set("x",0);
+         set("y",0);
+         set("z",0);
+         set("x span",x_span-2*radius);
+         set("y span",y_span);
+         set("z span",z_span);
+         set("index",index);
+        
+        # round the corners
+        for(i=1:2) {
+          for(j=1:2) {
+            addcircle;
+             set("x",x(i));
+             set("y",y(j));
+             set("z",0);
+             set("z span",z_span);  
+             set("radius",radius);
+             set("index",index);
+          }
+        }
+    ';
+    
+set('script',myscript); 
