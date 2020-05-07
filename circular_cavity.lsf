@@ -14,9 +14,9 @@
 #
 ##########################################################################
 
-# This file creates a layer of dielectric materital on which nano patterns
-# are inserted in the form of circular grooves. These groves are disposed in 
-# the form of concentric ring, forming a DBR having a cavity in the center.
+### This file creates a sequence of concentric rings with incresing radii, 
+### in order to create a cavity made with a circular DBR having given period and 
+### period and  fill factor
 
 addstructuregroup;
 set('name','circular cavity');
@@ -28,27 +28,10 @@ set('z',0);
     adduserprop('period',2,0.25e-6);        
     adduserprop('thickness',2,75e-9);
     adduserprop('n_groove',0,1);            # refreactive index of the groove (air)
-    #adduserprop('n_layer',2,1.5);     	    # refreactive index of the dielectric layer
-    #adduserprop('domain size',0,1e-6);      # horizontal domain size
     adduserprop('z min',2,0);   
         
     myscript= " 
         deleteall;
-        #if (%domain size% >= D+2*N_periods*period) {
-            #XY = %domain size%;
-        #} else {
-            #XY = D+2*N_periods*period;
-        #}
-        
-        #addrect;
-            #set('name','base');
-            #set('x',0);
-            #set('x span',XY);
-            #set('y',0);
-            #set('y span',XY);
-            #set('z min',0);
-            #set('z max',thickness);
-            #set('index', n_layer);
         if (N_periods!=0) {
         for (n = 1:N_periods){
             addring;

@@ -14,9 +14,13 @@
 #
 ##########################################################################
 
-# This file creates a structure group with the multilayer and the substrate
-# The multilayer design will be determined by one vector of containg the refractive index 
-# of each layer and another one contanig the thickness of each layer.
+### This file creates a multilayer structure together with its substrate. 
+### The multilayer design will be determined made out of two material with 
+### different refractive index (low and high).    
+### The number of pairs will be determined by  the propery 'N layer couples',
+### and the total number of layers will be either 2*N or 2*N+1 depending on
+### the values of the properties 'first layer type' and 'last layer type'
+
 addstructuregroup;
 set('name','multilayer');
 set('x',0);
@@ -24,16 +28,15 @@ set('y',0);
 set('z',0);
     adduserprop('substrate index',0,1.5);
     adduserprop('substrate thickness',2,1e-6);
-    adduserprop('H index',0,3+1i*1e-4);             # high refreactive index layer
+    adduserprop('H index',0,3+1i*1e-4);         # high refreactive index layer
     adduserprop('H thickness',2,0.1e-6);
-    adduserprop('L index',0,2+1i*1e-5);           # low refreactive index layer
+    adduserprop('L index',0,2+1i*1e-5);         # low refreactive index layer
     adduserprop('L thickness',2,0.1e-6);
     adduserprop('N layer couples',0,10);
-    adduserprop('first layer type',0,1);    # refractive index of the first and 
-    adduserprop('last layer type',0,1);     # last layers. 0 for low, 1 for high refractive index
+    adduserprop('first layer type',0,1);        # refractive index of the first and last 
+    adduserprop('last layer type',0,1);         # layers. 0 for low, 1 for high refractive index
     adduserprop('last layer thickness',2,0.05e-6);
-    adduserprop('domain size',2,1e-6);          # horizontal domain size
-    adduserprop('rm absorption in deep layers',2,1e-6);
+    adduserprop('domain size',2,1e-6);          # side of the square base of the structure
     
     myscript= " 
         deleteall;
@@ -47,10 +50,6 @@ set('z',0);
         type_first = %first layer type%;       # 0 if multilayer starts with low index, 1 else
         type_last =  %last layer type%;        # 0 if multilayer ends with low index, 1 else
         
-        rm_abs =     %rm absorption in deep layers%;      # if 1, the complex part of the refractive 
-                                                          # index for all layers will be set to 0, except  
-                                                          # for the firsts two on top (last couple)
-        
         if (type_first) {                      # if type_first is high, then suffix 'a' refers to high refractive index
             n_a = %H index%;
             n_b = %L index%;
@@ -63,12 +62,6 @@ set('z',0);
             l_b = %H thickness%;
         }
         
-        if (rm_abs) {
-            abs_a = imag(n_a);
-            ?abs_b = imag(n_b);
-            n_a = real(n_a);
-            n_b = real(n_b);
-        }
         
         l_period = l_a + l_b;
         
@@ -104,7 +97,7 @@ set('z',0);
                 set('y span',XY);
                 set('z min',-l_tot+l_sub+i*l_period-l_b);
                 set('z max',-l_tot+l_sub+i*l_period);
-                set('index',n_b+1i*abs_b);
+                set('index',n_b);
         }
         if (last_isInExcess) {
             addrect;
@@ -115,10 +108,10 @@ set('z',0);
                 set('y span',XY);
                 set('z min',-l_tot+l_sub+N*l_period);
                 set('z max',-l_tot+l_sub+N*l_period+l_last);
-                set('index',n_a+1i*abs_a);
+                set('index',n_a);
         } else {
             select('A'+num2str(N));
-                set('index',n_a+1i*abs_a);
+                set('index',n_a);
         }            
         
     ";

@@ -14,9 +14,13 @@
 #
 ##########################################################################
 
-# This file creates a structure group with the multilayer and the substrate
-# The multilayer design will be determined by one vector of containg the refractive index 
-# of each layer and another one contanig the thickness of each layer.
+### This file creates a structure group with the multilayer and the 
+### substrate. The multilayer design will be determined by one vector
+### containg the refractive index of each layer and another one contanig the 
+### thickness of each layer. The first and last values should be the one
+### for the substrate and external medium respectively (their thickness value
+### will be ignored, but should still be included).
+### The vectors should be saved in a .mat (MATLAB format) file.
 
 addstructuregroup;
 set('name','multilayer');
@@ -25,7 +29,7 @@ set('y',0);
 set('z',0);
     adduserprop('data file',1,'multilayer_design/base_design.mat');
     adduserprop('substrate thickness',2,1e-6);
-    adduserprop('domain size',2,1e-6);          # horizontal domain size
+    adduserprop('domain size',2,1e-6);          # side of the square base of the structure
     
     myscript= " 
         deleteall;

@@ -14,12 +14,14 @@
 #
 ##########################################################################
 
-# This file creates a spiral shaped structure in which it is possible to set
-# the number of arms, the internal diameter, the period of the spiral and the  
-# number of turns the arms do (actually it sets the number of periods seen 
-# radially, from the center outwards).
-# This spiral structure can be used for creating grooves onto a dielectric layer
-# (hence the name chosen for the various properties).
+### This file creates a structure that follows the curve described as 
+### r=r0*exp(tan(alpha)*theta), in polar coordinates. It describes a curve
+### that is always tilded by alpha degrees with respect to r (radius coming
+### from the origin). 
+### THIS CODE IS INCOMPLETE! It was meant to substitute a circular or a
+### spiral grating, but the part referring to the spiral version is not ready.
+### Therefore, setting the property 'topological charge' to any value different
+### from 0 will give an error.
 
 addstructuregroup;
 set('name','exponential outcoupler');
@@ -30,16 +32,18 @@ set('z',0);
     adduserprop('index groove',0,1);
     adduserprop('N rings',0,10);             # high refreactive index layer
     adduserprop('topological charge',0,0);   # number of arms of the spiral
-    adduserprop('thickness',2,0.1e-6);          # thickness
-    adduserprop('resolution',0,50);	     # number of points used for creating the spiral
-    adduserprop('groove tilt',0,45);	
-    adduserprop('start radius',2,1.5e-6);
+    adduserprop('thickness',2,0.1e-6);       
+    adduserprop('resolution',0,50);	
+    adduserprop('groove tilt',0,45);         # alpha
+    adduserprop('start radius',2,1.5e-6);    # r0
     adduserprop('period',2,0.25e-6);
     adduserprop('fill factor',0,0.5);
     adduserprop('z min',2,0);
     
     myscript= " 
         deleteall;
+        # setting the property 'topological charge' to any value different
+        # from 0 it will give an error
         material_out = %material groove%;
         index_out = %index groove%;
         n_rings = %N rings%;

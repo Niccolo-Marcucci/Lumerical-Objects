@@ -14,12 +14,13 @@
 #
 ##########################################################################
 
-# This file creates a spiral shaped structure in which it is possible to set
-# the number of arms, the internal diameter, the period of the spiral and the  
-# number of turns the arms do (actually it sets the number of periods seen 
-# radially, from the center outwards).
-# This spiral structure can be used for creating grooves onto a dielectric layer
-# (hence the name chosen for the various properties).
+### This file created a structure that is meant to resemble a circular 
+### outcoupler in which each ring has been decomposed in a set of small 
+### rectangles. Each regtangle can be tilted in order to create the desired
+### effect.
+### THIS CODE IS INCOMPLETE! The spiral version it's not ready, therfore 
+### setting  the property 'topological charge' to any value different from
+### 0 will give an error.
 
 addstructuregroup;
 set('name','metasurface outcoupler');
@@ -30,7 +31,7 @@ set('z',0);
     adduserprop('index groove',0,1);
     adduserprop('N rings',0,10);             # high refreactive index layer
     adduserprop('topological charge',0,0);   # number of arms of the spiral
-    adduserprop('thickness',2,0.1e-6);          # thickness
+    adduserprop('thickness',2,0.1e-6);       
     adduserprop('rectangular element tilt',2,45);	
     adduserprop('pattern type',1,'radial');	# options: 'filled', 'radial','radial filled'
     adduserprop('start radius',2,1.5e-6);
