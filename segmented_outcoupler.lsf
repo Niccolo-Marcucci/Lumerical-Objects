@@ -22,7 +22,7 @@ set('x',0);
 set('y',0);
 set('z',0);
     adduserprop('N_periods',0,5);	    # number of rings in the DBR
-    adduserprop('N_segments',2,12);  
+    adduserprop('N_segments',0,12);  
     adduserprop('D',2,6e-6);	    # diameter of the central cavity
     adduserprop('period',2,0.5e-6);        
     adduserprop('thickness',2,75e-9);
