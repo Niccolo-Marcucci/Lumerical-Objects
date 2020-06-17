@@ -68,6 +68,7 @@ set('setup script',myscript);
     addanalysisresult('lambda');
     addanalysisresult('frequency');
     addanalysisresult('spectrum');
+    addanalysisresult('resonance');
     addanalysisresult('Q');
     
 set('analysis script',read("spectral_analysis-analysis_script.lsf")); 

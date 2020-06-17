@@ -69,7 +69,7 @@ p = findpeaks(spectrum,%number of resonances%);
 lambda0 = lambda(p);
 f0 = f(p);
 
-
+resonance = lambda0(1);
 # output results
 for(i=1:length(p)) {
   ?"Resonances " + num2str(i) + ":";
