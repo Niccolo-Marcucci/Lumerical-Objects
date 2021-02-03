@@ -25,10 +25,10 @@ n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 
 % new design general properties
-design_name = "TM9";
+design_name = "TE_N7";
 design_file = strcat("designs/design_",design_name,".mat");
-pol='p';                            % polarisation: 'p' or 's'
-design_type='buried';               % either 'buried' or empty
+pol='s';                            % polarisation: 'p' or 's'
+design_type='';               % either 'buried' or empty
 
 lambda=570e-9;
 theta=linspace(30,70,1e5);
@@ -40,54 +40,49 @@ else
     n_in=real(n_SiO2);
 end
 n_out=1;
-d1=zeros(13,1);
-n1=ones(13,1);
+d1=zeros(17,1);
+n1=ones(17,1);
 
 %% Specify layer properties in group
-% n1(1)=n_in;n_Ti2O2;
-% n1(2:2:end)=n_Ti2O2;
-% n1(3:2:end)=n_AlO;
-% n1(end-4)=n_Ti2O2;
-% n1(end-3)=n_AlO;%n_SiO2;%n_Ti2O2;%
-% n1(end-2)=n_SiO2;%n_Ti2O2;%
-% n1(end-1)=n_Ti2O2;%n_SiO2;%
-% n1(end)=n_out;
+n1(1)=n_in;
+n1(2:2:14)=n_Ta2O5;
+n1(3:2:15)=n_SiO2;
+n1(16)=n_pmma;
+n1(17)=n_out;
 
-% d1(1)=0.4e-6;
-% d1(2:2:end)=105e-9;
-% d1(3:2:end)=169.722826087e-9;
-% d1(end-4)=100e-9;
-% d1(end-3)=430e-9;
-% d1(end-2)=20e-9;
-% d1(end-1)=85e-9;
-% d1(end)=3e-6;
+d1(1)=1e-6;
+d1(2:2:14)=95e-9;
+d1(3:2:13)=137e-9;
+d1(15)=127e-9;
+d1(16)=75e-9;
+d1(17)=1e-6;
 
 %% Specify layer properties, layer by layer
-n1(1)=n_in;
-n1(2)=n_Ti2O2;
-n1(3)=n_AlO;
-n1(4)=n_Ti2O2;
-n1(5)=n_AlO;
-n1(6)=n_Ti2O2;
-n1(7)=n_AlO;
-n1(8)=n_Ti2O2;
-n1(9)=n_AlO;
-n1(10)=n_SiO2;
-n1(11)=n_Ti2O2;
-n1(12)=1;
-
-d1(1)=0.4e-6;
-d1(2)=105e-9;
-d1(3)=169.722826087e-9;
-d1(4)=99.836956522e-9;
-d1(5)=169.7228260866e-9;
-d1(6)=99.8369565218e-9;
-d1(7)=169.7228260869e-9;
-d1(8)=99.8369565218e-9;
-d1(9)=429.29891304346e-9;
-d1(10)=19.967391304350e-9;
-d1(11)=79.869565217390e-9;
-d1(12)=249.184782608699e-9;
+% n1(1)=n_in;
+% n1(2)=n_Ti2O2;
+% n1(3)=n_AlO;
+% n1(4)=n_Ti2O2;
+% n1(5)=n_AlO;
+% n1(6)=n_Ti2O2;
+% n1(7)=n_AlO;
+% n1(8)=n_Ti2O2;
+% n1(9)=n_AlO;
+% n1(10)=n_SiO2;
+% n1(11)=n_Ti2O2;
+% n1(12)=1;
+% 
+% d1(1)=0.4e-6;
+% d1(2)=105e-9;
+% d1(3)=169.722826087e-9;
+% d1(4)=99.836956522e-9;
+% d1(5)=169.7228260866e-9;
+% d1(6)=99.8369565218e-9;
+% d1(7)=169.7228260869e-9;
+% d1(8)=99.8369565218e-9;
+% d1(9)=429.29891304346e-9;
+% d1(10)=19.967391304350e-9;
+% d1(11)=79.869565217390e-9;
+% d1(12)=249.184782608699e-9;
 
 [d1,n1] = prepare_multilayer(d1,n1);    % removes 0 thickness layers
                                         % if any
