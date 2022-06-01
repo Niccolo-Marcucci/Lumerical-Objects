@@ -1,0 +1,154 @@
+# Copyright 2020 Niccolò Marcucci <niccolo.marcucci@polito.it>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+##########################################################################
+
+### This file created a structure that is meant to resemble a circular 
+### outcoupler in which each ring has been decomposed in a set of small 
+### rectangles. Each regtangle can be tilted in order to create the desired
+### effect.
+### THIS CODE IS INCOMPLETE! The spiral version it's not ready, therfore 
+### setting  the property 'topological charge' to any value different from
+### 0 will give an error.
+
+addstructuregroup;
+set('name','pol splitter');
+set('x',0);
+set('y',0);
+set('z',0);
+    adduserprop('material groove',5,'<Object defined dielectric>');
+    adduserprop('index groove',0,1);
+    adduserprop('N rings',0,10);             # high refreactive index layer
+    adduserprop('topological charge',0,0);   # number of arms of the spiral
+    adduserprop('thickness',2,0.1e-6);       
+    adduserprop('scatter tilt',0,0);	     
+    #adduserprop('scatter length',2,0.4e-6);     
+    adduserprop('scatter width',2,0.05e-6);     
+    adduserprop('scatter shape',1,'v');		
+    adduserprop('pattern type',1,'filled');	# options: 'filled', 'radial'		
+    adduserprop('topology',1,'circular');  	# options: 'spiral', 'circular'	
+    adduserprop('start radius',2,1.5e-6);
+    adduserprop('period',2,0.5e-6);
+    adduserprop('wave period',2,0.6e-6);
+    adduserprop('fill factor',0,1);
+    adduserprop('D_phi',0,pi/6);
+    adduserprop('z min',2,0);
+    
+    myscript= " 
+        deleteall;
+        shape = %scatter shape%;
+        material_out = %material groove%;
+        index_out = %index groove%;
+        n_rings = %N rings%;
+        start_radius = %start radius%;
+        lambda = %period%;
+        lambda_bsw = %wave period%;
+        n_arms = %topological charge%;
+        FF = %fill factor%;
+        D=start_radius*2;
+        scatter_tilt = %scatter tilt%/180*pi;
+        type = %pattern type%;
+        resolution = 50;  # even value required
+        sc_width = %scatter width%;
+        sc_length = lambda*FF;
+        radius = matrix(resolution/2);        # radius, function of theta
+        theta = matrix(resolution/2);
+        vertices = matrix(2,resolution);
+        
+        int_res=15;
+        r_n=matrix(int_res);
+        the=matrix(int_res);
+        rel_width = sc_width / sc_length;
+        scatter_vertices_x = [0, .5, .5-rel_width/0.866, 0, -.5+rel_width*0.866, -.5] ;
+        scatter_vertices_y = [-.5, .5, .5, -.5+rel_width/0.5, .5, .5];
+        scatter_vertices = [scatter_vertices_x; scatter_vertices_y];
+        
+        if (n_rings!=0) {
+           for (n = 1:n_rings){
+                alpha = scatter_tilt;
+                
+                r0 = D/2+(n-1)*lambda;                
+                
+                L = 2*pi*r0 + pi*lambda*n_arms;
+                
+                # the followinf if statement is just for setting the actual 
+                # beginning of the scatter at D/2
+                if (shape == 'V' | shape == 'v') {
+                    r0 = r0 + lambda/2;
+                } else {
+                    r0 = r0 + sc_width/2;
+                }
+                
+                if (type == 'filled') {
+                    n_scatter = round(L/lambda);
+                    n_scatter = n_scatter - mod(n_scatter,n_arms)*(n_arms!=0);
+                }else if (type == 'radial') {
+                    n_scatter = round(2*pi*start_radius/lambda);
+                    n_scatter = n_scatter - mod(n_scatter,n_arms)*(n_arms!=0);
+                }else {
+                    error;
+                }
+                
+                if (n_arms != 0){
+                    theta_ = linspace(0, 2*pi/n_arms, n_scatter/n_arms);
+                    if (n_arms != 1){
+                        theta = theta_;
+                        for (i = 1:n_arms-1){ 
+                            theta = [theta; theta_]; 
+                            }
+                    }else{
+                        theta = theta_;
+                    }
+                }else{
+                    theta = zeros(n_scatter,1); 
+                }
+                
+                for ( k = 1:n_scatter ) {
+                    location_tilt = 2*pi/n_scatter*(k-1);
+                    
+                    if (topology == 'spiral') {
+                        radius = r0 + lambda_bsw*n_arms*theta(k)/2/pi;                   
+                        tilt = (pi/2 + scatter_tilt + location_tilt + (n-1)*D_phi)/pi*180;
+                    }else if (topology == 'circular') {
+                        radius = r0 ;
+                        tilt = (pi/2 + scatter_tilt + location_tilt + (n-1)*D_phi - theta(k)/2)/pi*180;
+                    }else {
+                        error;
+           fdsf         }
+                    
+                    if (shape == 'V' | shape == 'v') {
+                        tilt = tilt - 180;
+                        addpoly;		
+                          set('vertices', scatter_vertices * sc_length);
+                    }else{
+                        addrect;
+                          set('x span',sc_length);
+                          set('y span',sc_width);
+                    }
+                    set('name','scatter');
+                    set('material',material_out);
+                      if(get('material')=='<Object defined dielectric>') 
+                        { set('index',index_out); }
+                    set('x',radius*cos(location_tilt));
+                    set('y',radius*sin(location_tilt));
+                    set('z min', %z min%);
+                    set('z max', %z min%+thickness);
+                    set('first axis','z');
+                    set('rotation 1',tilt);
+                }
+            }
+        }
+    ";
+    
+set('script',myscript);
