@@ -20,22 +20,27 @@ addpath('functions');
 
 
 % design general properties
-design_name = "TM8_SiO2";
+design_name = "TE_N7";
 design_file = strcat("designs/design_",design_name,".mat");
 load(design_file)
-pol='p';                            % polarisation: 'p' or 's'
+pol='s';                            % polarisation: 'p' or 's'
+
+idx_layers(end-1) = 1.57+1i*1e-2;
+d_layers(end-1) = 60e-9; 
+
 
 theta_v = [linspace(0,90,2e3)];% , asin(linspace(1,2,2e3))/pi*180];%
-lambda_v=linspace(400,800,2e3)*1e-9;
+lambda_v=linspace(450,700,2e3)*1e-9;
 
 lambdaDBR=265e-9;                   % periodicity of the 2D DBR 
                                     % inscribed on the last layer
-lambda=570e-9;                      % wavelength of interest
+lambda=610e-9;                      % wavelength of interest
 
 [d,n,~,~] = prepare_multilayer(d_layers,...
                              idx_layers);%(end:-1:1)
+
 % n(1)=2; 
-% n(end-2)=n(end-1);
+% n(end-1)=n(end-1);
 R=zeros(length(lambda_v),length(theta_v));
 parfor i=1:length(lambda_v)
     [R(i,:),~]=reflectivity(lambda_v(i),theta_v,d,n,pol);
@@ -85,8 +90,8 @@ xlim([0 2.5e7])
 
 folder="~/OneDrive/BSW/Pictures/";
 name=strcat(folder,design_name,"_dispersion_beta");
-stopBeforeSaving(name)
-saveas(figure(1),name,'png')
+% stopBeforeSaving(name)
+% saveas(figure(1),name,'png')
 
 %% dispersion in theta
 theta2=theta_v;
@@ -102,7 +107,7 @@ s.EdgeColor='none';
 colormap('hot')
 colorbar
 view(2)
-whitebg(figure(2),'black'); 
+whitebg(figure(2),'black'   ); 
 set(gcf, 'InvertHardCopy', 'off');
 
 hold on
@@ -116,5 +121,5 @@ plot3([theta_v(1) theta_v(end)],lambda*[1 1],[1 1],'--m')
 
 folder="~/OneDrive/BSW/Pictures/";
 name=strcat(folder,design_name,"_dispersion_theta");
-saveas(figure(2),name,'png')
+% saveas(figure(2),name,'png')
 %%
