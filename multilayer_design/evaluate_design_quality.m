@@ -19,15 +19,17 @@ close all
 addpath('functions');
 
 % design general properties
-design_name = "TM_gd3_buriedDBR";
+design_name = "TE_N7";
 design_file = strcat("designs/design_",design_name,".mat");
 load(design_file);
-pol='p';                            % polarisation: 'p' or 's'
-design_type='buried';               % either 'buried' or empty
+pol='s';                            % polarisation: 'p' or 's'
+design_type='';               % either 'buried' or empty
 
-lambda=570e-9;
-theta = linspace(40,70,1e4);
+lambda=640e-9;
+theta = linspace(40,60,1e5);
 
+idx_layers(end-1) = 1.60+1i*1e-4;
+d_layers(end-1) = 30e-9; 
 d1=d_layers;
 n1=idx_layers;
 
@@ -59,9 +61,9 @@ for k = 1:2
             strcat(" n_{eff}=",string(n_eff)),'fontsize',14);
         
     [z1, ~,P ] = field_distribution(lambda,theta(idx),d,n,pol);
-    figure(2)
-    hold on
-    plot(z1,P)
+%     figure(2)
+%     hold on
+%     plot(z1,P)
 end
 
 [d1,n1] = prepare_multilayer(d1,n1);
@@ -96,7 +98,7 @@ nicePlot
 
 folder="~/OneDrive/BSW/Pictures/";
 name=strcat(folder,design_name,"_Field_distribution");
-stopBeforeSaving(name)
-saveas(figure(2),name,'png')
-name=strcat(folder,design_name,"_BWS_lines");
-saveas(figure(1),name,'png')
+% stopBeforeSaving(name)
+% saveas(figure(2),name,'png')
+% name=strcat(folder,design_name,"_BWS_lines");
+% saveas(figure(1),name,'png')
