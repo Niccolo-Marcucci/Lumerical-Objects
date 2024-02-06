@@ -17,9 +17,9 @@
 clear, close all
 addpath('functions');
 
-n_Ti2O2 = 2.53+1i*1e-4;           	% high refractive index
-n_AlO   = 1.65+1i*1e-4;             % low refractive index
-n_SiO2  = 1.46+1i*1e-4;             % low refractive index
+n_TiO2  = 2.39+1i*1e-4;           	% high refractive index
+n_AlO   = 1.629+1i*1e-4;             % low refractive index
+n_SiO2  = 1.455+1i*1e-4;             % low refractive index
 n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 n_high  = 3.00+1i*1e-4;
@@ -32,7 +32,7 @@ c0 = physconst('lightspeed');
 
 n_in =  real(n_SiO2);
 n_out = 1;
-nA = n_high;
+nA = n_TiO2;
 nB = n_SiO2;
 nlast = n_SiO2;
 ntail = n_pmma;
@@ -40,9 +40,11 @@ netch = n_AlO;
 
 pol  = 'p';
 
-N=8;
+N=9;
 
 theta_lim = asin(n_out/n_in) + 1.5/180*pi;
+theta = linspace(theta_lim/pi*180-3,56,1e3);        % angles vector
+
 kB = 2*pi/lambda*real(nB)*cos(40/180*pi);
 kA = 2*pi/lambda*real(nA)*cos(40/180*pi);
 FF = 0.5;
@@ -63,6 +65,15 @@ best_thicknesses(5) = dB_0;         % second layer below etch stop
 best_thicknesses(6) = dB_0;         % dielectric B
 best_thicknesses(7) = dA_0;         % dielectric A
 
+% copied from another deign
+best_thicknesses(1) = 0;            % second layer above etch stop
+best_thicknesses(2) = 63e-9;         % first layer above etch stop
+best_thicknesses(3) = 15e-9;        % etch stop layer
+best_thicknesses(4) = 63e-9;         % layer below etch stop
+best_thicknesses(5) = 141e-9;         % second layer below etch stop
+best_thicknesses(6) = 141e-9;         % dielectric B
+best_thicknesses(7) = 63e-9;         % dielectric A
+
 best_indeces(1) = n_in;             % substrate refractive index
 best_indeces(2) = n_out;            % air refractive index
 best_indeces(3) = nB;               % second material
@@ -73,7 +84,7 @@ best_indeces(7) = netch;            % etch stop
 
 
 %%%
-% load('best_param1');
+% load('best_param6');
 n_in = best_indeces(1);        
 n_out = best_indeces(2);       
 nB = best_indeces(3);          
@@ -101,21 +112,21 @@ tol=1;
 for j = 1: 1e4
     
     % randomize the parameter. One at a time. 
-    i=i+1;
-    if i==8                 
-        % reset shuffling index
-        i=2;
-        n = [n1(1:end-k) ; n1(end)];
-        d = [d1(1:end-k) ; d1(end)];
-    end
-    if i==3                 
-        % don't change etch stop thickness (comment if needed)
-        i=4;
-    end
-    if i==4 || i == 5
-        % don't change below etch stop (comment if needed)
-        i=6;
-    end
+    % i=i+1;
+    % if i==8                 
+    %     % reset shuffling index
+    %     i=2;
+    %     n = [n1(1:end-k) ; n1(end)];
+    %     d = [d1(1:end-k) ; d1(end)];
+    % end
+    % if i==3                 
+    %     % don't change etch stop thickness (comment if needed)
+    %     i=4;
+    % end
+    % if i==4 || i == 5
+    %     % don't change below etch stop (comment if needed)
+    %     i=6;
+    % end
     
 %     parameters = best_thicknesses ;
 
@@ -144,14 +155,14 @@ for j = 1: 1e4
 %             rangee = value/2;
 %     end
     value = best_thicknesses*1e9;
-    rangee = value * 0.6;
+    rangee = value * 0.3;
     parameters = round(value-rangee.*(rand(7,1)-0.5))*1e-9;
     
-%     parameters(4) = parameters(7);
-%     parameters(5) = parameters(6);
+    parameters(4) = parameters(7);
+    parameters(5) = parameters(6);
     parameters(3)=15e-9;
-    tail = parameters(1);
-    dlast= parameters(2);      
+    tail = 0;%parameters(1);
+    dlast= 63e-9;%parameters(2);      
     detch = parameters(3);
     dsecondlast_A = parameters(4);
     dsecondlast_B = parameters(5);
@@ -205,19 +216,19 @@ for j = 1: 1e4
             Xi(3+k) = threshold(P_end,min_H,max_H);
         end
     end
-%     contrast1a=n_eff(1)-n_eff(2);
-%     contrast1b=n_eff(1)/n_eff(2);
-    contrast2a=-(n_eff(3)-n_eff(2));
-    contrast2b=n_eff(2)/n_eff(3);
+    % contrast1a=n_eff(1)-n_eff(2);
+    % contrast1b=n_eff(1)/n_eff(2);
+    % contrast2a=-(n_eff(3)-n_eff(2));
+    % contrast2b=n_eff(2)/n_eff(3);
     
     % contribPr =utions to the partition function
     
-    min_c=0.050;
+    min_c=0.080;
     max_c=0.115;
-%     Xi(7) = threshold(contrast1a,min_c,max_c);
-    Xi(8) = threshold(contrast2a,min_c,max_c);
-%     Xi(9) = threshold(contrast1b,min_c+1,max_c+1);
-    Xi(10) = threshold(contrast2b,1+min_c,1+max_c);
+    % Xi(7) = threshold(contrast1a,min_c,max_c);
+    % Xi(8) = threshold(contrast2a,min_c,max_c);
+    % Xi(9) = threshold(contrast1b,min_c+1,max_c+1);
+    % Xi(10) = threshold(contrast2b,1+min_c,1+max_c);
 
     Xi_new = prod(Xi);
     if (Xi_new > Partition) && all(n_eff > sin(theta_lim)*n_in)

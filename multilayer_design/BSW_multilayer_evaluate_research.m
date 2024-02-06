@@ -24,8 +24,8 @@ n_SiO2  = 1.46+1i*1e-4;             % low refractive index
 n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 
-theta = linspace(29,56,1e4);                    % angle vector
-lambda=570e-9;
+theta = linspace(40,56,1e4);                    % angle vector
+lambda=580e-9;
 
 % the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
 load('best_param6');
@@ -79,7 +79,7 @@ d1(end-2) = dlast;
 d1(end-1) = tail;
 d1(end) = 3e-6;
 
-for k = 2:3
+for k = 1:2
     n = [n1(1:end-k) ; n1(end)];
     d = [d1(1:end-k) ; d1(end)];
     
@@ -96,16 +96,15 @@ for k = 2:3
     plot(theta,R)
 %     R(idx)
 %     t(idx)
-    [z1, ~, P ] = field_distribution(lambda,theta(idx),d,n,...
-                                                r(idx),t(idx),pol);
+    [z1, ~, P ] = field_distribution(lambda,theta(idx),d,n,pol, 1e3);
     figure(2)
     hold on
     plot(z1,P)
         
 end  
-n_eff(1)=n_eff(2);
+% n_eff(1)=n_eff(2);
 
-n_eff(1)/n_eff(3)
+n_eff(1)/n_eff(2)
 
 [d1,n1] = prepare_multilayer(d1,n1);
 
