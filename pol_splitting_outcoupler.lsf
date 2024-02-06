@@ -35,7 +35,7 @@ set('z',0);
     adduserprop('scatter tilt',0,0);	     
     #adduserprop('scatter length',2,0.4e-6);     
     adduserprop('scatter width',2,0.05e-6);     
-    adduserprop('scatter shape',1,'v');		
+    adduserprop('scatter shape',1,'');		
     adduserprop('pattern type',1,'filled');	# options: 'filled', 'radial'		
     adduserprop('topology',1,'circular');  	# options: 'spiral', 'circular'	
     adduserprop('start radius',2,1.5e-6);
@@ -125,7 +125,7 @@ set('z',0);
                         tilt = (pi/2 + scatter_tilt + location_tilt + (n-1)*D_phi - theta(k)/2)/pi*180;
                     }else {
                         error;
-           fdsf         }
+                    }
                     
                     if (shape == 'V' | shape == 'v') {
                         tilt = tilt - 180;
