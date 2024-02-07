@@ -54,7 +54,8 @@ set('z',0);
         start_radius = %start radius%;
         lambda = %period%;
         lambda_bsw = %wave period%;
-        n_arms = %topological charge%;
+        charge = %topological charge%;
+        n_arms = abs(charge);
         FF = %fill factor%;
         D=start_radius*2;
         scatter_tilt = %scatter tilt%/180*pi;
@@ -101,24 +102,26 @@ set('z',0);
                 }
                 
                 if (n_arms != 0){
-                    theta_ = linspace(0, 2*pi/n_arms, n_scatter/abs(n_arms));
-                    if (abs(n_arms) != 1){
+                    theta_ = linspace(0, 2*pi/charge, n_scatter/n_arms);
+                    if (n_arms != 1){
                         theta = theta_;
-                        for (i = 1:abs(n_arms)-1){ 
+                        for (i = 1:n_arms-1){ 
                             theta = [theta; theta_]; 
                             }
                     }else{
                         theta = theta_;
                     }
+                    segno = sign(charge);
                 }else{
                     theta = zeros(n_scatter,1); 
+                    segno = 1;
                 }
                 
                 for ( k = 1:n_scatter ) {
-                    location_tilt = 2*pi/n_scatter*(k-1)*sign(n_arms);
+                    location_tilt = 2*pi/n_scatter*(k-1)*segno;
                     
                     if (topology == 'spiral') {
-                        radius = r0 + lambda_bsw*n_arms*theta(k)/2/pi;                   
+                        radius = r0 + lambda_bsw*charge*theta(k)/2/pi;                   
                         tilt = (pi/2 + scatter_tilt + location_tilt + (n-1)*D_phi)/pi*180;
                     }else if (topology == 'circular') {
                         radius = r0 ;
