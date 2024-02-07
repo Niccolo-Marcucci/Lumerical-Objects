@@ -101,10 +101,10 @@ set('z',0);
                 }
                 
                 if (n_arms != 0){
-                    theta_ = linspace(0, 2*pi/n_arms, n_scatter/n_arms);
+                    theta_ = linspace(0, 2*pi/n_arms, n_scatter/abs(n_arms));
                     if (abs(n_arms) != 1){
                         theta = theta_;
-                        for (i = 1:n_arms-1){ 
+                        for (i = 1:abs(n_arms)-1){ 
                             theta = [theta; theta_]; 
                             }
                     }else{
