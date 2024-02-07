@@ -102,7 +102,7 @@ set('z',0);
                 
                 if (n_arms != 0){
                     theta_ = linspace(0, 2*pi/n_arms, n_scatter/n_arms);
-                    if (n_arms != 1){
+                    if (abs(n_arms) != 1){
                         theta = theta_;
                         for (i = 1:n_arms-1){ 
                             theta = [theta; theta_]; 
@@ -115,7 +115,7 @@ set('z',0);
                 }
                 
                 for ( k = 1:n_scatter ) {
-                    location_tilt = 2*pi/n_scatter*(k-1);
+                    location_tilt = 2*pi/n_scatter*(k-1)*sign(n_arms);
                     
                     if (topology == 'spiral') {
                         radius = r0 + lambda_bsw*n_arms*theta(k)/2/pi;                   
