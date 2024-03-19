@@ -10,6 +10,7 @@
 # avoid data files
 *.mat
 *.csv
+*.zip
 
 # avoid videos and images
 *.mpg
