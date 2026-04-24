@@ -19,19 +19,19 @@ close all;
 addpath('functions');
 
 n_Ti2O2 = 2.53+1i*1e-4;           	% high refractive index
-n_AlO   = 1.65+1i*1e-4;             % low refractive index
+n_AlO   = 1.63+1i*1e-4;             % low refractive index
 n_SiO2  = 1.46+1i*1e-4;             % low refractive index
-n_pmma  = 1.48+1i*1e-4;
+n_pmma  = 1.456+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 
 % new design general properties
-design_name = "TE_N7";
+design_name = "TE_N11_570nm";
 design_file = strcat("designs/design_",design_name,".mat");
 pol='s';                            % polarisation: 'p' or 's'
 design_type='';               % either 'buried' or empty
 
 lambda=570e-9;
-theta=linspace(30,70,1e5);
+theta=linspace(40,70,1e5);
 
 % define layers parameters
 if strcmp(design_type,'buried')
@@ -40,22 +40,24 @@ else
     n_in=real(n_SiO2);
 end
 n_out=1;
-d1=zeros(17,1);
-n1=ones(17,1);
+d1=zeros(25,1);
+n1=ones(25,1);
 
 %% Specify layer properties in group
 n1(1)=n_in;
-n1(2:2:14)=n_Ta2O5;
-n1(3:2:15)=n_SiO2;
-n1(16)=n_pmma;
-n1(17)=n_out;
+n1(2:2:22)=n_Ta2O5;
+n1(3:2:23)=n_SiO2;
+% n1(24)=n_AlO;
+n1(24)=n_pmma;
+n1(25)=n_out;
 
 d1(1)=1e-6;
-d1(2:2:14)=95e-9;
-d1(3:2:13)=137e-9;
-d1(15)=127e-9;
-d1(16)=75e-9;
-d1(17)=1e-6;
+d1(2:2:22)=95e-9;
+d1(3:2:21)=137e-9;
+d1(23)=127e-9;
+% d1(24)=5e-9;
+d1(24)=60e-9;
+d1(25)=1e-6;
 
 %% Specify layer properties, layer by layer
 % n1(1)=n_in;

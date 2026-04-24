@@ -18,23 +18,23 @@ clear
 close all
 addpath('functions');
 
-design_name = "TM_gd3_buriedDBR";
+design_name = "TM_TiO2SiO2_202603";
 design_file = strcat("designs/design_",design_name,".mat");
 load(design_file);
 pol='p';                            % polarisation: 'p' or 's'
-design_type='buried';               % either 'buried' or empty
-lambda_DBR = 165e-9;                % determines the beta at which the
+design_type='';               % either 'buried' or empty
+lambda_DBR = inf;                % determines the beta at which the
                                     % reflectivity is computed (see
                                     % usage).
 d1=d_layers;
 n1=idx_layers;
 
 beta = pi/lambda_DBR;
-lambda = linspace(500,640,1e4)*1e-9;
+lambda = linspace(400,1000,1e4)*1e-9;
 K = 2*pi./lambda*n1(1);
 theta = asin(beta./K)/pi*180;
 
-for k = 1:2
+for k = 2
     if strcmp(design_type,'buried')
         n = n1;
         d = d1;
@@ -48,8 +48,10 @@ for k = 1:2
     r = zeros(1,length(lambda));
      
     [dr,nr,~,~] = prepare_multilayer(d,n);
+
+    nr_=disperse_indices(nr,lambda);
     for i=1:length(lambda)
-        [R(i),r(i)] = reflectivity(lambda(i),theta(i),dr,nr,pol);
+        [R(i),r(i)] = reflectivity(lambda(i),theta(i),dr,nr_(:,i),pol);
     end
     [pks,idxs] = findpeaks(1-R);
     [~,pk_ix] = max(pks);
@@ -85,7 +87,7 @@ end
 nicePlot
 
 figure(1);
-plot(570*[1 1],[1e-3 1],'--k')
+% plot(570*[1 1],[1e-3 1],'--k')
 xlabel('wavelength [nm]')
 ylabel('Reflectivity')
 if strcmp(design_type,'buried')
@@ -102,3 +104,66 @@ stopBeforeSaving(name)
 saveas(figure(2),name,'png')
 name=strcat(folder,design_name,"_BWS_lines");
 saveas(figure(1),name,'png')
+
+
+function str = idx2str(value)
+    x = real(value);
+    if (1.44 <= x) &&  (x <= 1.47)
+        str = "SiO_2";
+    elseif (1.6 <= x) &&  (x <= 1.66)
+        str = "Al_2O_3";
+    elseif (2.3 <= x) &&  (x <= 2.6)
+        str = "TiO_2";
+    elseif x == 1.48
+        str = "PMMA";
+    elseif (1.95 <= x) &&  (x <= 2.2)
+        str = "Ta_2O_5";
+    elseif x == 1
+        str = "Air";
+    else
+        str = strcat("fake",string(real(value)),"");
+    end
+end
+
+function n_out=disperse_indices(n,lambda)
+    n_out = ones(length(n),length(lambda));
+    n_unique = unique(n);
+    for i = 1:length(n_unique)
+        switch idx2str(n_unique(i))
+            case "SiO_2"
+                data = readtable("./Dispersioni/SiO2 150deg PEALD 20260312.txt");
+                n_SiO2 = spline(data.nm, data.n, lambda*1e9);
+                if imag(n_unique(i)) == 0
+                    n_SiO2 = real(n_SiO2);
+                end
+            case "Al_2O_3"
+                data = readtable("./Dispersioni/Al2O3 150deg plasma.txt");
+                n_Al2O3 = spline(data.nm, data.n, lambda*1e9);
+            case "TiO_2"
+                data = readtable("./Dispersioni/TiO2 150deg PEALD 20260312.txt");
+                n_TiO2 = spline(data.nm, data.n, lambda*1e9);
+            case "PMMA"
+                n_PMMA = real(n_unique(i))*ones(1,length(lambda));
+            case "Ta_2O_5"
+                n_Ta_2O_5 = real(n_unique(i))*ones(1,length(lambda));
+            case "Air"
+                n_Air = real(n_unique(i))*ones(1,length(lambda));
+        end
+    end
+    for i = 1:length(n)
+        switch idx2str(n(i))
+            case "SiO_2"
+                n_out(i,:) = n_SiO2 + 1i*imag(n(i));
+            case "Al_2O_3"
+                n_out(i,:) = n_Al2O3 + 1i*imag(n(i));
+            case "TiO_2"
+                n_out(i,:) = n_TiO2 + 1i*imag(n(i));
+            case "PMMA"
+                n_out(i,:) = n_PMMA + 1i*imag(n(i));
+            case "Ta_2O_5"
+                n_out(i,:) = n_Ta_2O_5 + 1i*imag(n(i));
+            case "Air"
+                n_out(i,:) = n_Air + 1i*imag(n(i));
+        end
+    end
+end

@@ -17,9 +17,9 @@
 clear, close all
 addpath('functions');
 
-n_TiO2  = 2.447129515547422+1i*1e-4;           	% high refractive index
+n_TiO2  = 2.4444+1i*1e-4;           	% high refractive index
 n_AlO   = 1.6282+1i*1e-4;             % low refractive index
-n_SiO2  = 1.461636759906042+1i*1e-4;             % low refractive index
+n_SiO2  = 1.4615+1i*1e-4;             % low refractive index
 n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 n_high  = 3.00+1i*1e-4;
@@ -68,12 +68,12 @@ best_thicknesses(7) = dA_0;         % dielectric A
 
 % copied from another deign
 best_thicknesses(1) = 0;            % second layer above etch stop
-best_thicknesses(2) = 60e-9;         % first layer above etch stop
+best_thicknesses(2) = 69e-9;         % first layer above etch stop
 best_thicknesses(3) = 10e-9;        % etch stop layer
-best_thicknesses(4) = 72e-9;         % layer below etch stop
-best_thicknesses(5) = 154e-9;         % second layer below etch stop
-best_thicknesses(6) = 154e-9;         % dielectric B
-best_thicknesses(7) = 63e-9;         % dielectric A
+best_thicknesses(4) = 69e-9;         % layer below etch stop
+best_thicknesses(5) = 155e-9;         % second layer below etch stop
+best_thicknesses(6) = 155e-9;         % dielectric B
+best_thicknesses(7) = 69e-9;         % dielectric A
 
 best_indeces(1) = n_in;             % substrate refractive index
 best_indeces(2) = n_out;            % air refractive index
@@ -116,53 +116,19 @@ q = 1;
 RRR = zeros(N_max,2);
 PPP = zeros(N_max,3);
 
+n1(1) = n_in;
+n1(2:2:2*N) = nA;
+n1(3:2:2*N+1) = nB;
+n1(end-4) = nA;
+n1(end-3) = netch;
+n1(end-2) = nlast;
+n1(end-1) = ntail;
+n1(end) = n_out;
+    
 for j = 1: N_max
-    
-    % randomize the parameter. One at a time. 
-    % i=i+1;
-    % if i==8                 
-    %     % reset shuffling index
-    %     i=2;
-    %     n = [n1(1:end-k) ; n1(end)];
-    %     d = [d1(1:end-k) ; d1(end)];
-    % end
-    % if i==3                 
-    %     % don't change etch stop thickness (comment if needed)
-    %     i=4;
-    % end
-    % if i==4 || i == 5
-    %     % don't change below etch stop (comment if needed)
-    %     i=6;
-    % end
-    
-%     parameters = best_thicknesses ;
 
-%     value = best_thicknesses*1e9;
-%     switch i
-%         case 1              
-%             % pmma thickness
-%             rangee = value/2;
-%         case 2              
-%             % last layer thickness
-%             rangee = value/2;
-%         case 3              
-%             % AlO layer thicknes (etch stop layer)
-%             rangee = value/2;
-%         case 4              
-%             % first below etch stop
-%             rangee = value*2;
-%         case 5              
-%             % second below etch stop
-%             rangee = value/2;
-%         case 6
-%             % B
-%             rangee = value/2;
-%         case 7
-%             % A
-%             rangee = value/2;
-%     end
     value = best_thicknesses*1e9;
-    rangee = value * 0.1;
+    rangee = value * 0.5;
     if j == 1
         parameters = value*1e-9;
     else
@@ -185,15 +151,6 @@ for j = 1: N_max
     dsecondlast_B = parameters(5);
     dB = parameters(6);
     dA = parameters(7);
-    
-    n1(1) = n_in;
-    n1(2:2:2*N) = nA;
-    n1(3:2:2*N+1) = nB;
-    n1(end-4) = nA;
-    n1(end-3) = netch;
-    n1(end-2) = nlast;
-    n1(end-1) = ntail;
-    n1(end) = n_out;
     
     d1(1) = 0;
     d1(2:2:2*N) = dA;
@@ -322,4 +279,57 @@ end
 % random tossing
 function y = toss(value, ranges)
     y = round(value-ranges*(rand-0.5));
+end
+
+function f_optim(x,n1)
+    % constrains
+    % x(4) = parameters(7);
+    parameters(5) = parameters(6);
+    parameters(3)=10e-9;
+    parameters(1) = 0;
+    parameters(2) = 60e-9;
+
+
+    tail = parameters(1);
+    dlast= parameters(2);      
+    detch = parameters(3);
+    dsecondlast_B = parameters(5);
+    dsecondlast_A = x(3);
+    dB = x(2);
+    dA = x(1);
+    
+    d1(1) = 0;
+    d1(2:2:2*N) = dA;
+    d1(3:2:2*N+1) = dB;
+    d1(end-5) = dsecondlast_B;
+    d1(end-4) = dsecondlast_A;
+    d1(end-3) = detch;
+    d1(end-2) = dlast;
+    d1(end-1) = tail;
+    d1(end) = 0;
+    
+    min_r = 0.450;
+    max_r = 0.60;
+    Xi = 1;
+    for k = 2:3
+        n = [n1(1:end-k) ; n1(end)];
+        d = [d1(1:end-k) ; d1(end)];
+        [Rk,r,t] = reflectivity(lambda,theta,d,n,pol);
+        [pks,idxs] = findpeaks(1-Rk);
+        [~,pk_ix] = max(pks);
+        idx = idxs(pk_ix);
+        
+        if isempty(idx)
+            Xi = 0;
+        else
+            n_eff = sin(theta(idx)*pi/180)*n_in;
+
+            P_end = abs(t(idx))^2;
+
+            % contributions to the partition function
+
+            Xi(k) = threshold(1-Rk(idx),min_r,max_r);
+        end
+    end
+    return prod(Xi)
 end
