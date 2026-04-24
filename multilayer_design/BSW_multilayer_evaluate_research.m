@@ -25,19 +25,19 @@ n_pmma  = 1.48+1i*1e-4;
 n_Ta2O5 = 2.08+1i*1e-4;            	% high refractive inde
 
 theta = linspace(40,56,1e4);                    % angle vector
-lambda=580e-9;
+lambda=600e-9;
 
 % the stack is fixed to be S-(B-A)xN-B-AlO-last-tail-air
-load('best_param6');
+load('best_param8');
 % N=9;  
 % best_thicknesses;
 % best_indeces;
 
 pol = 'p';  
 scale_period = 1.0;
-
+best_thicknesses = round(best_thicknesses,9);
 tail = best_thicknesses(1);
-dlast = best_thicknesses(2);
+dlast = 60e-9;%best_thicknesses(2);
 detch = best_thicknesses(3);
 dsecondlast_A = best_thicknesses(4)*scale_period;
 dsecondlast_B = best_thicknesses(5)*scale_period;
@@ -78,6 +78,8 @@ d1(end-3) = detch;
 d1(end-2) = dlast;
 d1(end-1) = tail;
 d1(end) = 3e-6;
+
+[d1,n1] = prepare_multilayer(d1,n1);
 
 for k = 1:2
     n = [n1(1:end-k) ; n1(end)];
@@ -123,6 +125,10 @@ d_layers=d1;
 n_eff1=n_eff(1);
 n_eff2=n_eff(2);
 n_eff3=n_eff(3);
-name='designs/design_TM8_SiO2';
-% stopBeforeSaving(name)
-% save(name,'idx_layers','d_layers','n_eff1','n_eff2','n_eff3')
+name='designs/design_TM_TiO2SiO2_202603';
+stopBeforeSaving(name)
+save(name,'idx_layers','d_layers','n_eff1','n_eff2','n_eff3')
+
+
+
+
